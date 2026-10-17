@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","lib":["ES2022","DOM"],"module":"ESNext","moduleResolution":"Bundler","strict":true,"esModuleInterop":true,"skipLibCheck":true,"noEmit":true,"jsx":"react-jsx","resolveJsonModule":true},"include":["apps/**/*.ts","apps/**/*.tsx","tests/**/*.ts","scripts/**/*.ts"],"exclude":["node_modules","apps/web/.next"]}

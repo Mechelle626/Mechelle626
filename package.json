@@ -1,0 +1,73 @@
+{
+  "name": "braincraze",
+  "version": "1.0.0",
+  "description": "BrainCraze accounts, verification, membership, and access control",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "next dev apps/web --hostname 0.0.0.0",
+    "build": "next build apps/web",
+    "start": "next start apps/web --hostname 0.0.0.0",
+    "db:migrate": "node --env-file=apps/web/.env.local --import tsx scripts/migrate-auth.ts",
+    "typecheck": "tsc --noEmit -p apps/web/tsconfig.json",
+    "test": "node --env-file=apps/web/.env.local --import tsx --test --test-concurrency=1 tests/*.test.ts",
+    "test:e2e": "playwright test",
+    "db:cleanup": "node --env-file=apps/web/.env.local --import tsx scripts/cleanup-auth.ts",
+    "format": "prettier --write \"apps/web/**/*.{ts,tsx,css,json,mjs}\" \"tests/**/*.ts\" \"scripts/*auth.ts\" playwright.config.ts",
+    "school:admin": "node --env-file=apps/web/.env.local --import tsx scripts/school-admin.ts",
+    "platform:admin": "node --env-file=apps/web/.env.local --import tsx scripts/platform-admin.ts",
+    "identity:admin": "node --env-file=apps/web/.env.local --import tsx scripts/identity-admin.ts",
+    "i18n:extract": "node scripts/extract-messages.mjs",
+    "i18n:audit": "node --env-file=apps/web/.env.local scripts/audit-translations.mjs",
+    "i18n:seed": "node --env-file=apps/web/.env.local --import tsx scripts/seed-localization.ts",
+    "i18n:generate": "node --env-file=apps/web/.env.local --import tsx scripts/generate-translations.ts",
+    "i18n:export": "node --env-file=apps/web/.env.local --import tsx scripts/export-translations.ts",
+    "mail:deliver": "node --env-file=apps/web/.env.local --import tsx scripts/deliver-localized-email.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mechelle626/Mechelle626.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Mechelle626/Mechelle626/issues"
+  },
+  "homepage": "https://github.com/Mechelle626/Mechelle626#readme",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "country-region-data": "^4.1.0",
+    "file-type": "^22.2.0",
+    "jose": "^6.2.12",
+    "lucide-react": "^1.59.0",
+    "next": "^16.4.2",
+    "nodemailer": "^10.1.2",
+    "otpauth": "^9.5.2",
+    "pg": "^8.23.1",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sharp": "^0.35.5",
+    "stripe": "^23.0.0",
+    "tailwindcss": "^4.3.3",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "private": true
+}

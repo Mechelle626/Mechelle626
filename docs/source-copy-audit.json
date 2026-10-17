@@ -1,0 +1,4 @@
+{
+  "note": "Static audit covers JSX text/attributes, English-looking UI literals and selected server messages. Review dynamic copy and external vendor UI separately.",
+  "unextracted": []
+}
