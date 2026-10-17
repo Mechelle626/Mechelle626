@@ -65,5 +65,7 @@
   "email.notification.subject": "התראה מ־BrainCraze",
   "email.notification.body": "יש לך עדכון חדש ב־BrainCraze. יש להתחבר כדי לצפות בו: {0}",
   "ui.798ca2ce18bf2038": "יצירת חשבון",
-  "ui.86033f75a4c0876a": "יצירת חשבון"
+  "ui.86033f75a4c0876a": "יצירת חשבון",
+  "email.security.subject": "התראת אבטחה של BrainCraze",
+  "email.security.body": "הסיסמה או הגדרות האימות הדו־שלבי שלך ב־BrainCraze השתנו. אם לא ביצעת שינוי זה, יש לבדוק מיד את אבטחת החשבון: {0}"
 }

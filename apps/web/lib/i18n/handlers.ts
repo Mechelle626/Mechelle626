@@ -137,6 +137,7 @@ export async function localizationHandler(
           .strict()
           .parse(body);
         try {
+          b.code = Intl.getCanonicalLocales(b.code)[0];
           new Intl.DateTimeFormat(b.code).format();
         } catch {
           throw new AuthError(400, bcText("ui.67afdba2dde519db"));

@@ -65,5 +65,7 @@
   "email.notification.subject": "Pemberitahuan BrainCraze",
   "email.notification.body": "Anda mempunyai kemas kini baharu dalam BrainCraze. Log masuk untuk melihatnya: {0}",
   "ui.798ca2ce18bf2038": "Cipta Akaun",
-  "ui.86033f75a4c0876a": "Cipta Akaun"
+  "ui.86033f75a4c0876a": "Cipta Akaun",
+  "email.security.subject": "Pemberitahuan keselamatan BrainCraze",
+  "email.security.body": "Kata laluan atau tetapan pengesahan dua faktor BrainCraze anda telah berubah. Jika anda tidak membuat perubahan ini, semak keselamatan akaun anda dengan segera: {0}"
 }

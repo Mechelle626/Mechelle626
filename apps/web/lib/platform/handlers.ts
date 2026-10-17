@@ -1,3 +1,4 @@
+import {adminOverview,adminSubscriptions} from "./overview";
 import { message as bcText } from "../i18n/source";
 import { requireIdentity } from "../onboarding/flow";
 import { NextRequest } from "next/server";
@@ -57,6 +58,13 @@ export async function platformHandler(request: NextRequest, parts: string[]) {
             "X-Content-Type-Options": "nosniff",
           },
         });
+      }
+      if (action === "admin/overview") {await requireAdmin();return json(await adminOverview());}
+      if (action === "admin/subscriptions") {
+        await requireAdmin();
+        const page=z.coerce.number().int().min(1).max(10000).parse(request.nextUrl.searchParams.get("page")??1);
+        const status=z.enum(["","active","trialing","past_due","canceled","unpaid","incomplete","incomplete_expired","paused"]).parse(request.nextUrl.searchParams.get("status")??"");
+        return json(await adminSubscriptions((request.nextUrl.searchParams.get("q")??"").slice(0,100),page,status));
       }
       if (action === "admin/verifications") {
         await requireAdmin();

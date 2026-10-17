@@ -65,5 +65,7 @@
   "email.notification.subject": "የBrainCraze ማሳወቂያ",
   "email.notification.body": "በBrainCraze አዲስ ማሳወቂያ አለዎት። ለማየት ይግቡ፦ {0}",
   "ui.798ca2ce18bf2038": "መለያ ፍጠር",
-  "ui.86033f75a4c0876a": "መለያ ፍጠር"
+  "ui.86033f75a4c0876a": "መለያ ፍጠር",
+  "email.security.subject": "የBrainCraze የደህንነት ማሳወቂያ",
+  "email.security.body": "የBrainCraze የይለፍ ቃልዎ ወይም የሁለት ደረጃ ማረጋገጫ ቅንብሮችዎ ተቀይረዋል። ይህን ለውጥ እርስዎ ካላደረጉት፣ የመለያዎን ደህንነት ወዲያውኑ ይፈትሹ፦ {0}"
 }

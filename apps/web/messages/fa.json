@@ -65,5 +65,7 @@
   "email.notification.subject": "اعلان BrainCraze",
   "email.notification.body": "به‌روزرسانی جدیدی در BrainCraze دارید. برای دیدن آن وارد شوید: {0}",
   "ui.798ca2ce18bf2038": "ایجاد حساب",
-  "ui.86033f75a4c0876a": "ایجاد حساب"
+  "ui.86033f75a4c0876a": "ایجاد حساب",
+  "email.security.subject": "اعلان امنیتی BrainCraze",
+  "email.security.body": "گذرواژه یا تنظیمات احراز هویت دومرحله‌ای BrainCraze شما تغییر کرده است. اگر این تغییر را انجام نداده‌اید، فوراً امنیت حساب خود را بررسی کنید: {0}"
 }

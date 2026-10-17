@@ -25,6 +25,7 @@ try {
   );
   await client.query(await readFile(new URL("../packages/database/onboarding.sql", import.meta.url), "utf8"));
   await client.query(await readFile(new URL("../packages/database/localization.sql", import.meta.url), "utf8"));
+  await client.query(await readFile(new URL("../packages/database/account-readiness.sql", import.meta.url), "utf8"));
   await client.query("COMMIT");
   console.log("BrainCraze authentication schema applied.");
 } catch (e) {

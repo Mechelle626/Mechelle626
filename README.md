@@ -22,7 +22,7 @@ The local instance uses a **development outbox**. Emails are written to private 
 - Administrator verification review/moderation with recent 2FA, audited decisions, clean-scan approval gates, and suspension/ban session revocation.
 - Server/API verification and Premium guards, basic persisted community surfaces, theme/mascot skins, content-count analytics, and eligible schoolmate/tutor directories. GPA calculator and club finder are not built.
 
-See [Steps 7–12 implementation and configuration](docs/membership-and-access.md) for the exact scope, schema, endpoints, permission model, Stripe setup, and verified limitations. Current checks: production build, TypeScript, **52 backend tests and 30 browser tests passed**. Payment tests use fixtures, not a Stripe account.
+See [Steps 7–12 implementation and configuration](docs/membership-and-access.md) for the exact scope, schema, endpoints, permission model, Stripe setup, and verified limitations. Current checks: production build, TypeScript, **58 backend tests and 32 browser tests passed**. Payment tests use fixtures, not a Stripe account.
 
 ## Identity and onboarding extension
 
@@ -76,3 +76,10 @@ The existing i18n provider now uses database-backed language definitions and edi
 Run `npm run db:migrate` and `npm run i18n:seed` before starting this version. See [localization architecture, APIs, commands, and rollout plan](docs/localization.md).
 
 **Still blocked:** complete non-English draft generation requires the selected compatible provider's endpoint, model and API key in secure environment settings. No live generation or native-language review is claimed. `npm run i18n:audit` reports actual database coverage; `npm run i18n:audit -- --require-complete` fails while translations are missing. A populated draft is not an approved translation.
+
+
+### Ten-phase implementation and final audit
+
+The focused account/verification extension adds a complete landing layout, explicit verification checklist, admin overview/subscription inventory, security-event email queueing and configuration diagnostics. See [the final project audit](docs/project-audit.md) for verified scope, missing features, integration status, database/API changes, exact test outcomes and production-readiness ratings. The audit is included alongside the implementation.
+
+Apply `npm run db:migrate` and `npm run i18n:seed` before starting. `npm run integrations:check` checks variable/executable presence only and makes no external requests. See [email delivery and SMTP provider configuration](docs/email-delivery.md). The previously interrupted campus-tool drafts remain paused outside active routes and migrations.

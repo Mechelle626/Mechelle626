@@ -1,4 +1,5 @@
 "use client";
+import VerificationChecklist from "./verification-checklist";
 import { message as bcText } from "../lib/i18n/source";
 
 import { Localized } from "./localization";
@@ -37,6 +38,7 @@ export default function IdentitySettings() {
             <p>{" " + bcText("ui.30b024daf9712e6f")}{" "}
               {status ? statusLabels[status.selfieStatus] : bcText("ui.ba3bbbe10d8bef66")}
             </p>
+            {status?.checklist && (status.required || status.request) && <VerificationChecklist checklist={status.checklist} />}
             {status?.request?.notes && (
               <p>{bcText("ui.e80a40e616ea5c44") + " "}{status.request.notes}</p>
             )}

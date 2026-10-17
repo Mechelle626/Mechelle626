@@ -85,14 +85,15 @@ export function placeholders(text: string) {
     .join(",");
 }
 export function formattingTokens(text: string) {
-  return [
+  const tokens = [
     ...text.matchAll(
-      /\{\{[^}]+\}\}|\$\{[^}]+\}|\{[A-Za-z_][\w.-]*\}|%\d*\$?[sdif]|<\/?[a-zA-Z][^>]*>|https?:\/\/[^\s]+|\n/g,
+      /\{\{[^}]+\}\}|\$\{[^}]+\}|\{[ \t]*[A-Za-z_][\w. -]*[ \t]*\}|%%|%(?:\d+\$)?[-+ #0]*(?:\d+|\*)?(?:\.(?:\d+|\*))?[sdifFeEgGxXouc]|<\/?[a-zA-Z][^>]*>|https?:\/\/[^\s]+|\n/g,
     ),
   ]
     .map((x) => x[0])
-    .sort()
-    .join("\u0000");
+    .sort();
+  const tags = text.match(/<\/?[A-Za-z][^>]*>/g) ?? [];
+  return JSON.stringify({ tokens, tags });
 }
 export async function saveTranslation(
   actor: string,

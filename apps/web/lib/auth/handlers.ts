@@ -1,3 +1,5 @@
+import {validationFields} from "../i18n/validation";
+import {queueSecurityNotice} from "./security-notifications";
 import { sendLocalizedEmail } from "../i18n/email";
 import { message as bcText } from "../i18n/source";
 import {residenceSchema,validateResidence,applyResidence} from "../onboarding/registration";
@@ -281,6 +283,7 @@ export async function authHandler(request: NextRequest, parts: string[]) {
         await client.query("DELETE FROM braincraze.sessions WHERE user_id=$1", [
           rows[0].user_id,
         ]);
+        await queueSecurityNotice(client,rows[0].user_id,"password_reset");
       });
       await clearSession();
       return json({
@@ -292,7 +295,7 @@ export async function authHandler(request: NextRequest, parts: string[]) {
       const user = await requireUser();
       const { code } = z
         .object({
-          code: z.string().regex(/^\d{6}$/, "Enter a six-digit code."),
+          code: z.string().regex(/^\d{6}$/, bcText("ui.51361e99c23a7321")),
         })
         .parse(body);
       await rateLimit(`verify-attempt:${user.id}`, 10, 600);
@@ -395,7 +398,7 @@ export async function authHandler(request: NextRequest, parts: string[]) {
       return json(
         {
           error: bcText("ui.4a3ac9bb1378a7e9"),
-          fields: z.flattenError(error).fieldErrors,
+          fields: validationFields(error),
         },
         400,
       );

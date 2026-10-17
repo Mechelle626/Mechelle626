@@ -1,0 +1,119 @@
+# Executed test results
+
+Current ten-phase extension; baseline commit d6eaf26 plus the extension committed alongside this report. Fresh local run: 58 backend and 32 browser tests passed. Zero functional tests failed, skipped or cancelled. Test fixture/service simulations are not live-provider acceptance evidence.
+
+## Passing backend tests
+
+- admin overview and subscription inventory enforce role and recent MFA without leaking credentials
+- verification checklist reflects evidence rather than treating sign-in or upload as approval
+- security notices commit atomically and contain no authentication secrets
+- translation validation preserves nested tag order, named variables, printf tokens, and line breaks
+- SMTP uses TLS and development outbox cannot be used for a public deployment
+- password changes enqueue a security notice only after authenticated, successful mutation
+- passwords are salted, hashed, and verified; registration rejects admin and mismatch
+- registration, duplicate validation, mailbox verification, protected account, logout
+- login errors, remember-me cookie, multiple sessions, ownership and revocation
+- reset uses a single-use token, rejects old password, and invalidates sessions
+- expired verification/reset proofs fail and failed code attempts persist
+- CSRF, payload limits, allowed roles and anonymous protection are enforced
+- login rate limit and expired session are enforced
+- verification status exposes expiry/cooldown but no code; proof is hashed for a 15-minute lifetime
+- resend replaces the proof, resets the timer/attempts, and enforces cooldown under concurrency
+- ownership is session-bound and expiry is enforced at the 15-minute boundary
+- email delivery failure is recorded and cannot grant verification
+- all three provider adapters post to fixed HTTPS endpoints and require a verified response
+- provider failures, malformed results, wrong hostname, old/future timestamp, nonce and action fail closed
+- missing keys and unsupported configuration fail before contacting a provider
+- email verification is mandatory and users cannot forge a verified flag through the API
+- accepted mocked provider response persists human state; Step 4 remains gated
+- rejected provider result consumes the attempt without unlocking, and a fresh challenge can succeed
+- tokens cannot be replayed across accounts and challenges cannot cross sessions or outlive expiry
+- session revocation while the provider request is in flight prevents approval
+- admin language additions, catalog editing, conflicts, placeholders, feedback, coverage and permissions
+- all initial locales have draft email templates, exact tokens, direction and English fallback
+- OpenAI-compatible generation imports only validated pending drafts and rejects modified tokens
+- regional formatting preserves explicit language regions and locale-sensitive dates, times, amounts and digits
+- countries, territories, administrative areas and manual residence use real dataset validation
+- registration requires residence/institution details and permits an explicit no-academic-email route
+- identity APIs enforce email/human gates, selfie-first order, one document and private status responses
+- government ID review is manual, scan-gated, audited, and cannot grant school affiliation
+- institution review may award existing academic approval only with an explicit school-affiliation decision
+- additional-information/rejection states persist; resubmission supersedes the old request and prevents stale approval
+- identity is a separate API gate even for paid accounts; discovery accurately labels unbuilt and school-only features
+- language preferences validate all 18 locales, persist, format with Intl, and preserve missing-copy fallback
+- unverified new accounts can preview feature discovery without unlocking protected settings or content
+- all five badge labels derive from approved affiliation, never self-reported role or Premium
+- feature rules cover every academic role, Free/Premium, verified state, expiry and payment failure
+- HTTP authorization rejects forged grants, non-admins, unverified sellers, CSRF and private data access
+- friends-only profiles and media honor accepted connections and revoke access on removal
+- posts, messages, and marketplace listings use live badge status; message reads are participant-only
+- 2FA encrypts secrets, issues single-use recovery codes and gates password session creation
+- administrator review needs recent 2FA, clean scan, excludes self-review, and suspension revokes access and badges
+- Stripe price validation, Checkout idempotency, duplicate-subscription prevention and canonical webhook reconciliation
+- Stripe signature checks reject tampering, and checkout returns cannot grant Premium
+- PostgreSQL message RLS restricts a non-owner role to participants and rejects forged senders
+- billing cancellation, renewal, portal and invoice downloads are bound to the owner
+- directory is searchable and only exact, reviewed school/domain/role combinations are accepted
+- 15-minute hashed school email proof grants only the policy-approved school and role
+- ownership, failed-attempt limits, expiry, resend replacement and policy revocation fail closed
+- both ID methods encrypt and quarantine evidence; clean scan and explicit reviewer decision are required
+- bad files and scanner failure cannot approve an affiliation
+- new evidence supersedes old proofs and revokes prior approval while review is pending
+- HTTP endpoints enforce earlier gates, CSRF, roles, ownership and non-public documents
+- multipart ID uploads reject duplicate metadata and unknown fields before storing evidence
+- camera submissions reject PDF evidence and keep school approval unset
+
+## Passing browser tests
+
+- landing has plan comparison, factual buddy preview, verification overview, FAQ and footer on mobile
+- admin overview is readable, reports actual service setup and protects anonymous access
+- desktop signup → verify → sessions → logout → login → forgot → reset
+- mobile screens fit, controls are labeled, and missing reset token fails closed
+- mobile verification: countdown survives refresh, failures display, resend resets expiry, success persists
+- email gate redirects before CAPTCHA; missing keys keep the account locked on mobile
+- turnstile UI fixture: expiration/error/retry/success callbacks; browser mocks cannot unlock the real API
+- recaptcha UI fixture: expiration/error/retry/success callbacks; browser mocks cannot unlock the real API
+- hcaptcha UI fixture: expiration/error/retry/success callbacks; browser mocks cannot unlock the real API
+- blocked CAPTCHA script reports a load failure and offers a retry
+- first visit suggests device language, keeps English until consent, and persists choice
+- admin adds a language, edits a pending draft, and resolves a member translation report
+- landing precedes authentication, persists a language choice and supports all 18 locale directions
+- localized registration preserves canonical role values and supports manual residence and no academic email
+- selfie camera denial blocks progress without offering a selfie file upload
+- mobile selfie, alternative ID, administrator review, tutorial skip/resume/replay and discovery work together
+- mobile pricing, plan selection and billing show real unconfigured and empty states
+- settings save profile, privacy and picture; private profile blocks another member
+- authenticator setup enables 2FA and a recovery code completes a password login
+- Premium and verification frontend guards agree with backend; themes save and expire
+- approved badges render on posts, messages and marketplace and disappear after revocation
+- admin dashboard blocks unscanned approval, reviews clean evidence, and suspends an account
+- school route enforces login, email, human, then school ordering
+- mobile school search, all selectable methods, role policy, email failure and success
+- school ID upload remains private and pending without automatic approval
+- camera fixture captures an image, stops its tracks, and submits the same review workflow
+- camera denial is actionable and upload remains selectable
+- school status outage shows an error and retry restores the actual form and keyboard search
+- dedicated mobile ID upload previews, removes, rejects invalid files and submits a dropped image
+- PDF selection displays a private file card without embedding the document
+- scan screen denies submission after permission refusal and offers upload fallback
+- leaving scan screen stops a camera stream even when permission resolves late
+
+## Failing checks
+
+- `npm run i18n:audit -- --require-complete`: exit 1. Each non-English language has 1,113 missing entries. This check has not been skipped or described as passing.
+
+## Other passing checks
+
+- Production build and TypeScript checking.
+- Source-copy extraction heuristic: zero detected remaining literals under its rules.
+- Production-dependency advisory scan: zero known vulnerabilities in this run (not a security certification).
+
+## Not run / not established
+
+- Valid-credential Google/Microsoft/Apple sign-in and each live CAPTCHA service.
+- Real SMTP sender acceptance and inbox receipt through any named provider.
+- Real Stripe Checkout/portal/webhook/payment lifecycle.
+- OpenAI-compatible external generation with a valid configured model/key.
+- Real ClamAV/signature health and clean/infected-file acceptance.
+- Physical mobile camera/liveness or automated document-authenticity verification.
+- Public deployment, production backup restoration and independent security/language review.

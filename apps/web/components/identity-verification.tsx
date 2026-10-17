@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import SchoolCamera from "./school-camera";
 import SchoolIdUploader from "./school-id-uploader";
+import VerificationChecklist from "./verification-checklist";
 import { statusLabels, type IdentityStatus } from "../lib/onboarding/contracts";
 export default function IdentityVerification() {
   const [status, setStatus] = useState<IdentityStatus | null>(null),
@@ -76,6 +77,7 @@ export default function IdentityVerification() {
               {error}
             </p>
           )}
+          {status?.checklist && <VerificationChecklist checklist={status.checklist} />}
           {!status ? (
             <button className="text-button" onClick={load}>
               {error ? bcText("ui.bd3e14f7c803d502") : bcText("ui.bab117c96a6814f3")}

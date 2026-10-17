@@ -65,5 +65,7 @@
   "email.notification.subject": "BrainCraze सूचना",
   "email.notification.body": "BrainCraze में आपके लिए एक नया अपडेट है। देखने के लिए साइन इन करें: {0}",
   "ui.798ca2ce18bf2038": "खाता बनाएँ",
-  "ui.86033f75a4c0876a": "खाता बनाएँ"
+  "ui.86033f75a4c0876a": "खाता बनाएँ",
+  "email.security.subject": "BrainCraze सुरक्षा सूचना",
+  "email.security.body": "आपका BrainCraze पासवर्ड या दो-चरणीय प्रमाणीकरण सेटिंग बदल गई है। यदि आपने यह बदलाव नहीं किया है, तो तुरंत अपने खाते की सुरक्षा जाँचें: {0}"
 }

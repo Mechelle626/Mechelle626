@@ -65,5 +65,7 @@
   "email.notification.subject": "BrainCraze 알림",
   "email.notification.body": "BrainCraze에 새로운 소식이 있습니다. 로그인하여 확인하세요: {0}",
   "ui.798ca2ce18bf2038": "계정 만들기",
-  "ui.86033f75a4c0876a": "계정 만들기"
+  "ui.86033f75a4c0876a": "계정 만들기",
+  "email.security.subject": "BrainCraze 보안 알림",
+  "email.security.body": "BrainCraze 비밀번호 또는 2단계 인증 설정이 변경되었습니다. 직접 변경하지 않으셨다면 즉시 계정 보안을 확인하세요: {0}"
 }

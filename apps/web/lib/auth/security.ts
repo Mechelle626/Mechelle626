@@ -10,19 +10,19 @@ import { z } from "zod";
 import { roles } from "./contracts";
 export const passwordSchema = z
   .string()
-  .min(12, "Use at least 12 characters.")
-  .max(128, "Use at most 128 characters.");
+  .min(12, bcText("ui.618b57689fc12d5f"))
+  .max(128, bcText("ui.860a8f936b334811"));
 export const profileSchema = z.object({
-  firstName: z.string().trim().min(1, "First name is required.").max(80),
-  lastName: z.string().trim().min(1, "Last name is required.").max(80),
+  firstName: z.string().trim().min(1, bcText("ui.7633806b104639f5")).max(80),
+  lastName: z.string().trim().min(1, bcText("ui.9d8dc637e16fa2ba")).max(80),
   username: z
     .string()
     .trim()
     .toLowerCase()
     .min(3)
     .max(30)
-    .regex(/^[a-z0-9_]+$/, "Use letters, numbers, and underscores."),
-  school: z.string().trim().min(2, "School is required.").max(160),
+    .regex(/^[a-z0-9_]+$/, bcText("ui.b0747916fcf24984")),
+  school: z.string().trim().min(2, bcText("ui.c25e4c70e65e6ee1")).max(160),
   role: z.enum(roles),
 });
 export const emailSchema = z.string().trim().toLowerCase().email().max(254);

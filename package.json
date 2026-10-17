@@ -25,7 +25,8 @@
     "i18n:seed": "node --env-file=apps/web/.env.local --import tsx scripts/seed-localization.ts",
     "i18n:generate": "node --env-file=apps/web/.env.local --import tsx scripts/generate-translations.ts",
     "i18n:export": "node --env-file=apps/web/.env.local --import tsx scripts/export-translations.ts",
-    "mail:deliver": "node --env-file=apps/web/.env.local --import tsx scripts/deliver-localized-email.ts"
+    "mail:deliver": "node --env-file=apps/web/.env.local --import tsx scripts/deliver-localized-email.ts",
+    "integrations:check": "node --env-file=apps/web/.env.local --import tsx scripts/check-integrations.ts"
   },
   "repository": {
     "type": "git",

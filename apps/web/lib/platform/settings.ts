@@ -1,3 +1,4 @@
+import {queueSecurityNotice} from "../auth/security-notifications";
 import { message as bcText } from "../i18n/source";
 import { z } from "zod";
 import sharp from "sharp";
@@ -139,6 +140,7 @@ export async function securityAction(
         "DELETE FROM braincraze.sessions WHERE user_id=$1 AND id<>$2",
         [user.id, user.session_id],
       );
+      await queueSecurityNotice(client,user.id,"password_changed");
     });
     return { message: bcText("ui.eadb3362be235010") };
   }
@@ -177,6 +179,7 @@ export async function securityAction(
         "UPDATE braincraze.sessions SET mfa_verified_at=NULL WHERE user_id=$1",
         [user.id],
       );
+      await queueSecurityNotice(client,user.id,"two_factor_disabled");
     });
     return {
       message:

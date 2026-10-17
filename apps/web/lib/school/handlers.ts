@@ -1,3 +1,4 @@
+import {validationFields} from "../i18n/validation";
 import { message as bcText } from "../i18n/source";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -151,7 +152,7 @@ export async function schoolHandler(request: NextRequest, parts: string[]) {
         {
           error:
             bcText("ui.ecccdc4314a00f26"),
-          fields: z.flattenError(error).fieldErrors,
+          fields: validationFields(error),
         },
         400,
       );

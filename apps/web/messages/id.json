@@ -65,5 +65,7 @@
   "email.notification.subject": "Notifikasi BrainCraze",
   "email.notification.body": "Anda memiliki pembaruan baru di BrainCraze. Masuk untuk melihatnya: {0}",
   "ui.798ca2ce18bf2038": "Buat Akun",
-  "ui.86033f75a4c0876a": "Buat Akun"
+  "ui.86033f75a4c0876a": "Buat Akun",
+  "email.security.subject": "Notifikasi keamanan BrainCraze",
+  "email.security.body": "Kata sandi atau pengaturan autentikasi dua faktor BrainCraze Anda telah berubah. Jika Anda tidak melakukan perubahan ini, segera periksa keamanan akun Anda: {0}"
 }

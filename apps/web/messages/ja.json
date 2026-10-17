@@ -65,5 +65,7 @@
   "email.notification.subject": "BrainCraze からのお知らせ",
   "email.notification.body": "BrainCraze に新しいお知らせがあります。ログインしてご確認ください：{0}",
   "ui.798ca2ce18bf2038": "アカウント作成",
-  "ui.86033f75a4c0876a": "アカウント作成"
+  "ui.86033f75a4c0876a": "アカウント作成",
+  "email.security.subject": "BrainCraze セキュリティ通知",
+  "email.security.body": "BrainCraze のパスワードまたは二要素認証の設定が変更されました。心当たりがない場合は、すぐにアカウントのセキュリティをご確認ください：{0}"
 }

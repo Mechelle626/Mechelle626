@@ -65,5 +65,7 @@
   "email.notification.subject": "Liyebisi ya BrainCraze",
   "email.notification.body": "Ozali na liyebisi ya sika na BrainCraze. Kɔtá mpo na kotala yango: {0}",
   "ui.798ca2ce18bf2038": "Kosala konti",
-  "ui.86033f75a4c0876a": "Kosala konti"
+  "ui.86033f75a4c0876a": "Kosala konti",
+  "email.security.subject": "Liyebisi ya bokengi ya BrainCraze",
+  "email.security.body": "Mot de passe to ba paramètres ya kondima na biteni mibale ya BrainCraze ebongwani. Soki yo nde obongoli yango te, talá mbala moko bokengi ya konti na yo: {0}"
 }

@@ -4,6 +4,7 @@ import { message as bcText } from "../lib/i18n/source";
 import { Localized } from "./localization";
 
 import Link from "next/link";
+import LandingSections from "./landing-sections";
 import { useState, useEffect } from "react";
 import { Brand } from "./auth-shell";
 import LocationSearch from "./location-search";
@@ -94,6 +95,7 @@ export default function Landing() {
               <p>{" " + bcText("ui.2150804df25bfd49") + " "}</p>
             </article>
           </section>
+          <LandingSections />
         </main>
       }
     </Localized>

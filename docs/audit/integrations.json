@@ -1,0 +1,89 @@
+{
+  "services": {
+    "smtp": {
+      "configured": false,
+      "missing": [
+        "SMTP_HOST",
+        "MAIL_FROM"
+      ],
+      "liveTested": false
+    },
+    "google": {
+      "configured": false,
+      "missing": [
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET"
+      ],
+      "liveTested": false
+    },
+    "microsoft": {
+      "configured": false,
+      "missing": [
+        "MICROSOFT_CLIENT_ID",
+        "MICROSOFT_CLIENT_SECRET"
+      ],
+      "liveTested": false
+    },
+    "apple": {
+      "configured": false,
+      "missing": [
+        "APPLE_CLIENT_ID",
+        "APPLE_TEAM_ID",
+        "APPLE_KEY_ID",
+        "APPLE_PRIVATE_KEY"
+      ],
+      "liveTested": false
+    },
+    "turnstile": {
+      "configured": false,
+      "missing": [
+        "TURNSTILE_SITE_KEY",
+        "TURNSTILE_SECRET_KEY"
+      ],
+      "liveTested": false
+    },
+    "recaptcha": {
+      "configured": false,
+      "missing": [
+        "RECAPTCHA_SITE_KEY",
+        "RECAPTCHA_SECRET_KEY"
+      ],
+      "liveTested": false
+    },
+    "hcaptcha": {
+      "configured": false,
+      "missing": [
+        "HCAPTCHA_SITE_KEY",
+        "HCAPTCHA_SECRET_KEY"
+      ],
+      "liveTested": false
+    },
+    "stripe": {
+      "configured": false,
+      "missing": [
+        "STRIPE_SECRET_KEY",
+        "STRIPE_PRICE_MONTHLY",
+        "STRIPE_PRICE_YEARLY",
+        "STRIPE_WEBHOOK_SECRET"
+      ],
+      "liveTested": false
+    },
+    "translations": {
+      "configured": false,
+      "missing": [
+        "I18N_AI_BASE_URL",
+        "I18N_AI_MODEL",
+        "I18N_AI_API_KEY"
+      ],
+      "liveTested": false
+    }
+  },
+  "publicHttps": false,
+  "mailMode": "development-outbox",
+  "encryptedStorageConfigured": true,
+  "scanner": {
+    "executablePresent": false,
+    "signaturesValidated": false
+  },
+  "note": "Configuration presence does not prove live service operation. No external requests were made."
+}

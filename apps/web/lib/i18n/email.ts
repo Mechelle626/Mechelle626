@@ -2,7 +2,7 @@ import { db } from "../auth/db";
 import { catalog, enabledLocale, listLanguages } from "./store";
 import { sendMail } from "../auth/mail";
 export type EmailTemplate =
-  "verification" | "school" | "reset" | "subscription" | "notification";
+  "verification" | "school" | "reset" | "subscription" | "notification" | "security";
 export async function renderEmail(
   template: EmailTemplate,
   language: string,

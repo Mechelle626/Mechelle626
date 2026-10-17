@@ -25,7 +25,7 @@ export const emailRequestSchema = selectionSchema
 export const schoolCodeSchema = z
   .object({
     requestId: z.uuid(),
-    code: z.string().regex(/^\d{6}$/, "Enter a six-digit code."),
+    code: z.string().regex(/^\d{6}$/, bcText("ui.51361e99c23a7321")),
   })
   .strict();
 export function canonicalDomain(value: string) {

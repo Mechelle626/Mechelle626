@@ -65,5 +65,7 @@
   "email.notification.subject": "ናይ BrainCraze መፍለጢ",
   "email.notification.body": "ኣብ BrainCraze ሓድሽ መፍለጢ ኣለኩም። ንምርኣይ እተዉ፦ {0}",
   "ui.798ca2ce18bf2038": "ሕሳብ ፍጠር",
-  "ui.86033f75a4c0876a": "ሕሳብ ፍጠር"
+  "ui.86033f75a4c0876a": "ሕሳብ ፍጠር",
+  "email.security.subject": "ናይ BrainCraze ድሕነት መፍለጢ",
+  "email.security.body": "ናይ BrainCraze መሕለፊ ቃልኩም ወይ ናይ ክልተ ደረጃ መረጋገጺ ቅጥዕታትኩም ተቐይሮም። እዚ ለውጢ ንስኻትኩም እንተዘይገበርኩምዎ፣ ድሕነት ሕሳብኩም ብቕልጡፍ መርምሩ፦ {0}"
 }

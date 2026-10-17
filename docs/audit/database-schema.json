@@ -1,0 +1,3008 @@
+{
+  "scope": "Observed local braincraze schema; metadata only, no application records or credentials.",
+  "tables": [
+    {
+      "table_name": "EmailVerification"
+    },
+    {
+      "table_name": "VerificationDocuments"
+    },
+    {
+      "table_name": "account_profiles"
+    },
+    {
+      "table_name": "account_security"
+    },
+    {
+      "table_name": "admin_audit"
+    },
+    {
+      "table_name": "billing_customers"
+    },
+    {
+      "table_name": "challenges"
+    },
+    {
+      "table_name": "friendships"
+    },
+    {
+      "table_name": "human_verification_challenges"
+    },
+    {
+      "table_name": "human_verification_tokens"
+    },
+    {
+      "table_name": "identities"
+    },
+    {
+      "table_name": "identity_review_logs"
+    },
+    {
+      "table_name": "identity_verifications"
+    },
+    {
+      "table_name": "languages"
+    },
+    {
+      "table_name": "listings"
+    },
+    {
+      "table_name": "localized_email_queue"
+    },
+    {
+      "table_name": "messages"
+    },
+    {
+      "table_name": "mfa_logins"
+    },
+    {
+      "table_name": "oauth_flows"
+    },
+    {
+      "table_name": "oauth_profiles"
+    },
+    {
+      "table_name": "onboarding_progress"
+    },
+    {
+      "table_name": "posts"
+    },
+    {
+      "table_name": "rate_limits"
+    },
+    {
+      "table_name": "school_email_domains"
+    },
+    {
+      "table_name": "school_review_logs"
+    },
+    {
+      "table_name": "school_verification_requests"
+    },
+    {
+      "table_name": "schools"
+    },
+    {
+      "table_name": "sessions"
+    },
+    {
+      "table_name": "stripe_events"
+    },
+    {
+      "table_name": "subscriptions"
+    },
+    {
+      "table_name": "translation_audit"
+    },
+    {
+      "table_name": "translation_keys"
+    },
+    {
+      "table_name": "translation_reports"
+    },
+    {
+      "table_name": "translations"
+    },
+    {
+      "table_name": "users"
+    }
+  ],
+  "columns": [
+    {
+      "table_name": "EmailVerification",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "EmailVerification",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "EmailVerification",
+      "column_name": "code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "EmailVerification",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "EmailVerification",
+      "column_name": "verified",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "EmailVerification",
+      "column_name": "attempts",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "EmailVerification",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "EmailVerification",
+      "column_name": "verified_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "EmailVerification",
+      "column_name": "delivery_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'pending'::text"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "verification_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "document_type",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "document_url",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "document_key",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "mime",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "bytes",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "capture_method",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "scan_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'pending'::text"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "verification_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'pending_review'::text"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "reviewer_notes",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "column_name": "uploaded_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "account_profiles",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "account_profiles",
+      "column_name": "bio",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "''::text"
+    },
+    {
+      "table_name": "account_profiles",
+      "column_name": "visibility",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'public'::text"
+    },
+    {
+      "table_name": "account_profiles",
+      "column_name": "picture",
+      "data_type": "bytea",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account_profiles",
+      "column_name": "banner",
+      "data_type": "bytea",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account_profiles",
+      "column_name": "theme",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'classic'::text"
+    },
+    {
+      "table_name": "account_profiles",
+      "column_name": "buddy_skin",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'classic'::text"
+    },
+    {
+      "table_name": "account_profiles",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "account_security",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "account_security",
+      "column_name": "totp_secret",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account_security",
+      "column_name": "pending_secret",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account_security",
+      "column_name": "pending_expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account_security",
+      "column_name": "enabled",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "account_security",
+      "column_name": "last_counter",
+      "data_type": "bigint",
+      "is_nullable": "NO",
+      "column_default": "'-1'::integer"
+    },
+    {
+      "table_name": "account_security",
+      "column_name": "recovery_hashes",
+      "data_type": "ARRAY",
+      "is_nullable": "NO",
+      "column_default": "'{}'::text[]"
+    },
+    {
+      "table_name": "admin_audit",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "admin_audit",
+      "column_name": "actor_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "admin_audit",
+      "column_name": "subject_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "admin_audit",
+      "column_name": "action",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "admin_audit",
+      "column_name": "reason",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "admin_audit",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "stripe_customer_id",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "checkout_session_id",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "checkout_expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "challenges",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "challenges",
+      "column_name": "kind",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "challenges",
+      "column_name": "token_hash",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "challenges",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "challenges",
+      "column_name": "attempts",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "challenges",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "friendships",
+      "column_name": "requester_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "friendships",
+      "column_name": "recipient_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "friendships",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'pending'::text"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "column_name": "session_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "column_name": "provider",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "(clock_timestamp() + '00:10:00'::interval)"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "column_name": "used_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "human_verification_tokens",
+      "column_name": "token_hash",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "human_verification_tokens",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "human_verification_tokens",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "identities",
+      "column_name": "provider",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identities",
+      "column_name": "subject",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identities",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_review_logs",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "identity_review_logs",
+      "column_name": "verification_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_review_logs",
+      "column_name": "actor_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_review_logs",
+      "column_name": "action",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_review_logs",
+      "column_name": "notes",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_review_logs",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'collecting'::text"
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "institution_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "school_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "role",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "submitted_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "reviewer_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "reviewer_notes",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "identity_verifications",
+      "column_name": "reviewed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "languages",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "languages",
+      "column_name": "code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "languages",
+      "column_name": "language_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "languages",
+      "column_name": "native_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "languages",
+      "column_name": "enabled",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "table_name": "languages",
+      "column_name": "direction",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'ltr'::text"
+    },
+    {
+      "table_name": "listings",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "listings",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "listings",
+      "column_name": "title",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "listings",
+      "column_name": "body",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "listings",
+      "column_name": "price_cents",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "listings",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "template",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "template_values",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "deduplication_key",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "attempts",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "sent_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "next_attempt_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "messages",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "messages",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "messages",
+      "column_name": "recipient_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "messages",
+      "column_name": "body",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "messages",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "mfa_logins",
+      "column_name": "token_hash",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "mfa_logins",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "mfa_logins",
+      "column_name": "remember",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "mfa_logins",
+      "column_name": "user_agent",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "mfa_logins",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "mfa_logins",
+      "column_name": "attempts",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "oauth_flows",
+      "column_name": "state_hash",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_flows",
+      "column_name": "provider",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_flows",
+      "column_name": "nonce",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_flows",
+      "column_name": "verifier",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_flows",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_profiles",
+      "column_name": "token_hash",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_profiles",
+      "column_name": "provider",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_profiles",
+      "column_name": "subject",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_profiles",
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_profiles",
+      "column_name": "email_verified",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_profiles",
+      "column_name": "first_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_profiles",
+      "column_name": "last_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "oauth_profiles",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "onboarding_progress",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "onboarding_progress",
+      "column_name": "tutorial_step",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "onboarding_progress",
+      "column_name": "tutorial_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'not_started'::text"
+    },
+    {
+      "table_name": "onboarding_progress",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "posts",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "posts",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "posts",
+      "column_name": "body",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "posts",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "rate_limits",
+      "column_name": "key",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "rate_limits",
+      "column_name": "count",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "rate_limits",
+      "column_name": "resets_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_email_domains",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "school_email_domains",
+      "column_name": "school_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_email_domains",
+      "column_name": "domain",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_email_domains",
+      "column_name": "email_roles",
+      "data_type": "ARRAY",
+      "is_nullable": "NO",
+      "column_default": "'{}'::text[]"
+    },
+    {
+      "table_name": "school_email_domains",
+      "column_name": "active",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "table_name": "school_email_domains",
+      "column_name": "policy_reference",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_email_domains",
+      "column_name": "reviewed_by",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_email_domains",
+      "column_name": "reviewed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "school_review_logs",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "school_review_logs",
+      "column_name": "request_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_review_logs",
+      "column_name": "reviewer",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_review_logs",
+      "column_name": "action",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_review_logs",
+      "column_name": "reason",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_review_logs",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "school_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "role",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "method",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "university_email",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "domain_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "code_hash",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "code_expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "code_issued_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "attempts",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "delivery_status",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "document_key",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "document_mime",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "document_bytes",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "document_scan_status",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "submitted_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "approved_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "reviewer",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "school_verification_requests",
+      "column_name": "reason",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "schools",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "schools",
+      "column_name": "name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "schools",
+      "column_name": "active",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "table_name": "schools",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "token_hash",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "user_agent",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "last_seen_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "remember",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "mfa_verified_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "stripe_events",
+      "column_name": "id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "stripe_events",
+      "column_name": "event_type",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "stripe_events",
+      "column_name": "processed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "stripe_subscription_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "stripe_price_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "period_end",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "cancel_at_period_end",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "translation_audit",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "translation_audit",
+      "column_name": "actor_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_audit",
+      "column_name": "action",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_audit",
+      "column_name": "details",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_audit",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "translation_keys",
+      "column_name": "translation_key",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_keys",
+      "column_name": "english_source",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_keys",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "language_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "translation_key",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "report_type",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "notes",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'Open'::text"
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "resolved_by",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "translation_reports",
+      "column_name": "resolved_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "translations",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "translations",
+      "column_name": "language_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translations",
+      "column_name": "translation_key",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translations",
+      "column_name": "translation_value",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "translations",
+      "column_name": "review_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'Pending Language Review'::text"
+    },
+    {
+      "table_name": "translations",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "translations",
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "users",
+      "column_name": "first_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "last_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "username",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "password_hash",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "school",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "role",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "email_verified_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "users",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "users",
+      "column_name": "human_verified",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "users",
+      "column_name": "human_verified_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "human_verification_provider",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "school_verified",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "users",
+      "column_name": "verified_school_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "verified_school_role",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "school_verified_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "is_admin",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "users",
+      "column_name": "account_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'active'::text"
+    },
+    {
+      "table_name": "users",
+      "column_name": "country",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "country_code",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "region",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "region_code",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "institution_name",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "institution_email",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "institution_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "preferred_language",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'en'::text"
+    },
+    {
+      "table_name": "users",
+      "column_name": "onboarding_required",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "users",
+      "column_name": "selfie_verification_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'not_started'::text"
+    },
+    {
+      "table_name": "users",
+      "column_name": "identity_verification_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'not_started'::text"
+    },
+    {
+      "table_name": "verification_badges",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "verification_badges",
+      "column_name": "role",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "verification_badges",
+      "column_name": "school_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_attempts_check",
+      "definition": "CHECK (((attempts >= 0) AND (attempts <= 5)))"
+    },
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_check",
+      "definition": "CHECK ((verified = (verified_at IS NOT NULL)))"
+    },
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_code_check",
+      "definition": "CHECK ((code ~ '^[a-f0-9]{64}$'::text))"
+    },
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_delivery_status_check",
+      "definition": "CHECK ((delivery_status = ANY (ARRAY['pending'::text, 'sent'::text, 'failed'::text])))"
+    },
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_user_id_key",
+      "definition": "UNIQUE (user_id)"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_bytes_check",
+      "definition": "CHECK (((bytes >= 1) AND (bytes <= 10485760)))"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_capture_method_check",
+      "definition": "CHECK ((capture_method = ANY (ARRAY['camera'::text, 'upload'::text])))"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_document_key_key",
+      "definition": "UNIQUE (document_key)"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_document_type_check",
+      "definition": "CHECK ((document_type = ANY (ARRAY['selfie'::text, 'institution_id'::text, 'passport'::text, 'drivers_license'::text, 'national_id'::text, 'government_id'::text])))"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_document_url_check",
+      "definition": "CHECK ((document_url ~~ 'private://%'::text))"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_mime_check",
+      "definition": "CHECK ((mime = ANY (ARRAY['image/jpeg'::text, 'application/pdf'::text])))"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_scan_status_check",
+      "definition": "CHECK ((scan_status = ANY (ARRAY['pending'::text, 'clean'::text, 'infected'::text, 'error'::text])))"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_verification_id_fkey",
+      "definition": "FOREIGN KEY (verification_id) REFERENCES braincraze.identity_verifications(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_verification_status_check",
+      "definition": "CHECK ((verification_status = ANY (ARRAY['pending_review'::text, 'under_review'::text, 'verified'::text, 'additional_information_required'::text, 'rejected'::text])))"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_banner_check",
+      "definition": "CHECK ((octet_length(banner) <= 4194304))"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_bio_check",
+      "definition": "CHECK ((length(bio) <= 1000))"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_buddy_skin_check",
+      "definition": "CHECK ((buddy_skin = ANY (ARRAY['classic'::text, 'fox'::text, 'owl'::text])))"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_picture_check",
+      "definition": "CHECK ((octet_length(picture) <= 2097152))"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_pkey",
+      "definition": "PRIMARY KEY (user_id)"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_theme_check",
+      "definition": "CHECK ((theme = ANY (ARRAY['classic'::text, 'midnight'::text, 'lavender'::text])))"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_visibility_check",
+      "definition": "CHECK ((visibility = ANY (ARRAY['public'::text, 'private'::text, 'friends'::text])))"
+    },
+    {
+      "table_name": "account_security",
+      "name": "account_security_check",
+      "definition": "CHECK (((NOT enabled) OR (totp_secret IS NOT NULL)))"
+    },
+    {
+      "table_name": "account_security",
+      "name": "account_security_pkey",
+      "definition": "PRIMARY KEY (user_id)"
+    },
+    {
+      "table_name": "account_security",
+      "name": "account_security_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "admin_audit",
+      "name": "admin_audit_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES braincraze.users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "admin_audit",
+      "name": "admin_audit_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "admin_audit",
+      "name": "admin_audit_subject_id_fkey",
+      "definition": "FOREIGN KEY (subject_id) REFERENCES braincraze.users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "billing_customers",
+      "name": "billing_customers_pkey",
+      "definition": "PRIMARY KEY (user_id)"
+    },
+    {
+      "table_name": "billing_customers",
+      "name": "billing_customers_stripe_customer_id_key",
+      "definition": "UNIQUE (stripe_customer_id)"
+    },
+    {
+      "table_name": "billing_customers",
+      "name": "billing_customers_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "challenges",
+      "name": "challenges_kind_check",
+      "definition": "CHECK ((kind = ANY (ARRAY['verify'::text, 'reset'::text])))"
+    },
+    {
+      "table_name": "challenges",
+      "name": "challenges_pkey",
+      "definition": "PRIMARY KEY (user_id, kind)"
+    },
+    {
+      "table_name": "challenges",
+      "name": "challenges_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "friendships",
+      "name": "friendships_check",
+      "definition": "CHECK ((requester_id <> recipient_id))"
+    },
+    {
+      "table_name": "friendships",
+      "name": "friendships_pkey",
+      "definition": "PRIMARY KEY (requester_id, recipient_id)"
+    },
+    {
+      "table_name": "friendships",
+      "name": "friendships_recipient_id_fkey",
+      "definition": "FOREIGN KEY (recipient_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "friendships",
+      "name": "friendships_requester_id_fkey",
+      "definition": "FOREIGN KEY (requester_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "friendships",
+      "name": "friendships_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'accepted'::text])))"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "name": "human_verification_challenges_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "name": "human_verification_challenges_provider_check",
+      "definition": "CHECK ((provider = ANY (ARRAY['recaptcha'::text, 'hcaptcha'::text, 'turnstile'::text])))"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "name": "human_verification_challenges_session_id_fkey",
+      "definition": "FOREIGN KEY (session_id) REFERENCES braincraze.sessions(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "name": "human_verification_challenges_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "human_verification_tokens",
+      "name": "human_verification_tokens_pkey",
+      "definition": "PRIMARY KEY (token_hash)"
+    },
+    {
+      "table_name": "human_verification_tokens",
+      "name": "human_verification_tokens_token_hash_check",
+      "definition": "CHECK ((token_hash ~ '^[a-f0-9]{64}$'::text))"
+    },
+    {
+      "table_name": "human_verification_tokens",
+      "name": "human_verification_tokens_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "identities",
+      "name": "identities_pkey",
+      "definition": "PRIMARY KEY (provider, subject)"
+    },
+    {
+      "table_name": "identities",
+      "name": "identities_provider_check",
+      "definition": "CHECK ((provider = ANY (ARRAY['google'::text, 'microsoft'::text, 'apple'::text])))"
+    },
+    {
+      "table_name": "identities",
+      "name": "identities_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "identity_review_logs",
+      "name": "identity_review_logs_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES braincraze.users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "identity_review_logs",
+      "name": "identity_review_logs_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "identity_review_logs",
+      "name": "identity_review_logs_verification_id_fkey",
+      "definition": "FOREIGN KEY (verification_id) REFERENCES braincraze.identity_verifications(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "identity_verifications",
+      "name": "identity_verifications_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "identity_verifications",
+      "name": "identity_verifications_reviewer_id_fkey",
+      "definition": "FOREIGN KEY (reviewer_id) REFERENCES braincraze.users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "identity_verifications",
+      "name": "identity_verifications_school_id_fkey",
+      "definition": "FOREIGN KEY (school_id) REFERENCES braincraze.schools(id)"
+    },
+    {
+      "table_name": "identity_verifications",
+      "name": "identity_verifications_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['collecting'::text, 'pending_review'::text, 'under_review'::text, 'verified'::text, 'additional_information_required'::text, 'rejected'::text, 'superseded'::text])))"
+    },
+    {
+      "table_name": "identity_verifications",
+      "name": "identity_verifications_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "languages",
+      "name": "languages_check",
+      "definition": "CHECK (((code <> 'en'::text) OR enabled))"
+    },
+    {
+      "table_name": "languages",
+      "name": "languages_code_check",
+      "definition": "CHECK ((code ~ '^[a-z]{2,3}(-[A-Za-z0-9]{1,8})*$'::text))"
+    },
+    {
+      "table_name": "languages",
+      "name": "languages_code_key",
+      "definition": "UNIQUE (code)"
+    },
+    {
+      "table_name": "languages",
+      "name": "languages_direction_check",
+      "definition": "CHECK ((direction = ANY (ARRAY['ltr'::text, 'rtl'::text])))"
+    },
+    {
+      "table_name": "languages",
+      "name": "languages_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "listings",
+      "name": "listings_body_check",
+      "definition": "CHECK (((length(body) >= 1) AND (length(body) <= 3000)))"
+    },
+    {
+      "table_name": "listings",
+      "name": "listings_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "listings",
+      "name": "listings_price_cents_check",
+      "definition": "CHECK (((price_cents >= 0) AND (price_cents <= 10000000)))"
+    },
+    {
+      "table_name": "listings",
+      "name": "listings_title_check",
+      "definition": "CHECK (((length(title) >= 1) AND (length(title) <= 160)))"
+    },
+    {
+      "table_name": "listings",
+      "name": "listings_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "name": "localized_email_queue_deduplication_key_key",
+      "definition": "UNIQUE (deduplication_key)"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "name": "localized_email_queue_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "name": "localized_email_queue_template_check",
+      "definition": "CHECK ((template = ANY (ARRAY['subscription'::text, 'notification'::text, 'security'::text])))"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "name": "localized_email_queue_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "messages",
+      "name": "messages_body_check",
+      "definition": "CHECK (((length(body) >= 1) AND (length(body) <= 3000)))"
+    },
+    {
+      "table_name": "messages",
+      "name": "messages_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "messages",
+      "name": "messages_recipient_id_fkey",
+      "definition": "FOREIGN KEY (recipient_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "messages",
+      "name": "messages_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "mfa_logins",
+      "name": "mfa_logins_attempts_check",
+      "definition": "CHECK (((attempts >= 0) AND (attempts <= 5)))"
+    },
+    {
+      "table_name": "mfa_logins",
+      "name": "mfa_logins_pkey",
+      "definition": "PRIMARY KEY (token_hash)"
+    },
+    {
+      "table_name": "mfa_logins",
+      "name": "mfa_logins_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "oauth_flows",
+      "name": "oauth_flows_pkey",
+      "definition": "PRIMARY KEY (state_hash)"
+    },
+    {
+      "table_name": "oauth_profiles",
+      "name": "oauth_profiles_pkey",
+      "definition": "PRIMARY KEY (token_hash)"
+    },
+    {
+      "table_name": "onboarding_progress",
+      "name": "onboarding_progress_pkey",
+      "definition": "PRIMARY KEY (user_id)"
+    },
+    {
+      "table_name": "onboarding_progress",
+      "name": "onboarding_progress_tutorial_status_check",
+      "definition": "CHECK ((tutorial_status = ANY (ARRAY['not_started'::text, 'in_progress'::text, 'completed'::text, 'skipped'::text])))"
+    },
+    {
+      "table_name": "onboarding_progress",
+      "name": "onboarding_progress_tutorial_step_check",
+      "definition": "CHECK (((tutorial_step >= 0) AND (tutorial_step <= 11)))"
+    },
+    {
+      "table_name": "onboarding_progress",
+      "name": "onboarding_progress_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "posts",
+      "name": "posts_body_check",
+      "definition": "CHECK (((length(body) >= 1) AND (length(body) <= 3000)))"
+    },
+    {
+      "table_name": "posts",
+      "name": "posts_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "posts",
+      "name": "posts_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "rate_limits",
+      "name": "rate_limits_pkey",
+      "definition": "PRIMARY KEY (key)"
+    },
+    {
+      "table_name": "school_email_domains",
+      "name": "school_email_domains_domain_check",
+      "definition": "CHECK ((domain = lower(domain)))"
+    },
+    {
+      "table_name": "school_email_domains",
+      "name": "school_email_domains_domain_key",
+      "definition": "UNIQUE (domain)"
+    },
+    {
+      "table_name": "school_email_domains",
+      "name": "school_email_domains_email_roles_check",
+      "definition": "CHECK ((email_roles <@ ARRAY['Student'::text, 'Faculty'::text, 'Teaching Assistant'::text, 'Tutor'::text, 'Staff'::text]))"
+    },
+    {
+      "table_name": "school_email_domains",
+      "name": "school_email_domains_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "school_email_domains",
+      "name": "school_email_domains_school_id_fkey",
+      "definition": "FOREIGN KEY (school_id) REFERENCES braincraze.schools(id)"
+    },
+    {
+      "table_name": "school_review_logs",
+      "name": "school_review_logs_action_check",
+      "definition": "CHECK ((action = ANY (ARRAY['approve'::text, 'reject'::text, 'needs_information'::text, 'view_document'::text, 'scan'::text])))"
+    },
+    {
+      "table_name": "school_review_logs",
+      "name": "school_review_logs_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "school_review_logs",
+      "name": "school_review_logs_request_id_fkey",
+      "definition": "FOREIGN KEY (request_id) REFERENCES braincraze.school_verification_requests(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_attempts_check",
+      "definition": "CHECK (((attempts >= 0) AND (attempts <= 5)))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_check",
+      "definition": "CHECK ((((method = 'email'::text) AND (university_email IS NOT NULL) AND (domain_id IS NOT NULL) AND (document_key IS NULL)) OR ((method = ANY (ARRAY['upload'::text, 'camera'::text])) AND (document_key IS NOT NULL) AND (code_hash IS NULL))))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_delivery_status_check",
+      "definition": "CHECK ((delivery_status = ANY (ARRAY['pending'::text, 'sent'::text, 'failed'::text])))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_document_bytes_check",
+      "definition": "CHECK (((document_bytes >= 1) AND (document_bytes <= 10485760)))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_document_mime_check",
+      "definition": "CHECK ((document_mime = ANY (ARRAY['image/jpeg'::text, 'application/pdf'::text])))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_document_scan_status_check",
+      "definition": "CHECK ((document_scan_status = ANY (ARRAY['pending'::text, 'clean'::text, 'infected'::text, 'error'::text])))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_domain_id_fkey",
+      "definition": "FOREIGN KEY (domain_id) REFERENCES braincraze.school_email_domains(id)"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_method_check",
+      "definition": "CHECK ((method = ANY (ARRAY['email'::text, 'upload'::text, 'camera'::text])))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_role_check",
+      "definition": "CHECK ((role = ANY (ARRAY['Student'::text, 'Faculty'::text, 'Teaching Assistant'::text, 'Tutor'::text, 'Staff'::text])))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_school_id_fkey",
+      "definition": "FOREIGN KEY (school_id) REFERENCES braincraze.schools(id)"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['awaiting_email'::text, 'pending_review'::text, 'needs_information'::text, 'approved'::text, 'rejected'::text, 'superseded'::text])))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "schools",
+      "name": "schools_name_key",
+      "definition": "UNIQUE (name)"
+    },
+    {
+      "table_name": "schools",
+      "name": "schools_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_token_hash_key",
+      "definition": "UNIQUE (token_hash)"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "stripe_events",
+      "name": "stripe_events_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_pkey",
+      "definition": "PRIMARY KEY (user_id)"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_stripe_subscription_id_key",
+      "definition": "UNIQUE (stripe_subscription_id)"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "translation_audit",
+      "name": "translation_audit_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES braincraze.users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "translation_audit",
+      "name": "translation_audit_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "translation_keys",
+      "name": "translation_keys_pkey",
+      "definition": "PRIMARY KEY (translation_key)"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_language_id_fkey",
+      "definition": "FOREIGN KEY (language_id) REFERENCES braincraze.languages(id)"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_notes_check",
+      "definition": "CHECK (((length(notes) >= 1) AND (length(notes) <= 2000)))"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_report_type_check",
+      "definition": "CHECK ((report_type = ANY (ARRAY['Incorrect translation'::text, 'Missing translation'::text, 'Poor translation quality'::text])))"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_resolved_by_fkey",
+      "definition": "FOREIGN KEY (resolved_by) REFERENCES braincraze.users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['Open'::text, 'Resolved'::text, 'Dismissed'::text])))"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_translation_key_fkey",
+      "definition": "FOREIGN KEY (translation_key) REFERENCES braincraze.translation_keys(translation_key)"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES braincraze.users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_language_id_fkey",
+      "definition": "FOREIGN KEY (language_id) REFERENCES braincraze.languages(id)"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_language_id_translation_key_key",
+      "definition": "UNIQUE (language_id, translation_key)"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_review_status_check",
+      "definition": "CHECK ((review_status = ANY (ARRAY['Draft'::text, 'Pending Language Review'::text, 'Reviewed'::text, 'Approved'::text])))"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_translation_key_fkey",
+      "definition": "FOREIGN KEY (translation_key) REFERENCES braincraze.translation_keys(translation_key)"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_updated_by_fkey",
+      "definition": "FOREIGN KEY (updated_by) REFERENCES braincraze.users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "users",
+      "name": "users_account_status_check",
+      "definition": "CHECK ((account_status = ANY (ARRAY['active'::text, 'suspended'::text, 'banned'::text])))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_email_check",
+      "definition": "CHECK ((email = lower(email)))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_email_key",
+      "definition": "UNIQUE (email)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_human_verification_provider_check",
+      "definition": "CHECK ((human_verification_provider = ANY (ARRAY['recaptcha'::text, 'hcaptcha'::text, 'turnstile'::text])))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_identity_verification_status_check",
+      "definition": "CHECK ((identity_verification_status = ANY (ARRAY['not_started'::text, 'pending_review'::text, 'under_review'::text, 'verified'::text, 'additional_information_required'::text, 'rejected'::text])))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_institution_id_fkey",
+      "definition": "FOREIGN KEY (institution_id) REFERENCES braincraze.schools(id)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_role_check",
+      "definition": "CHECK ((role = ANY (ARRAY['Student'::text, 'Faculty'::text, 'Teaching Assistant'::text, 'Tutor'::text, 'Staff'::text])))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_selfie_verification_status_check",
+      "definition": "CHECK ((selfie_verification_status = ANY (ARRAY['not_started'::text, 'pending_review'::text, 'under_review'::text, 'verified'::text, 'additional_information_required'::text, 'rejected'::text])))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_username_check",
+      "definition": "CHECK ((username = lower(username)))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_username_key",
+      "definition": "UNIQUE (username)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_verified_school_id_fkey",
+      "definition": "FOREIGN KEY (verified_school_id) REFERENCES braincraze.schools(id)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_verified_school_role_check",
+      "definition": "CHECK ((verified_school_role = ANY (ARRAY['Student'::text, 'Faculty'::text, 'Teaching Assistant'::text, 'Tutor'::text, 'Staff'::text])))"
+    }
+  ],
+  "indexes": [
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_pkey",
+      "definition": "CREATE UNIQUE INDEX \"EmailVerification_pkey\" ON braincraze.\"EmailVerification\" USING btree (id)"
+    },
+    {
+      "table_name": "EmailVerification",
+      "name": "EmailVerification_user_id_key",
+      "definition": "CREATE UNIQUE INDEX \"EmailVerification_user_id_key\" ON braincraze.\"EmailVerification\" USING btree (user_id)"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_document_key_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationDocuments_document_key_key\" ON braincraze.\"VerificationDocuments\" USING btree (document_key)"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "VerificationDocuments_pkey",
+      "definition": "CREATE UNIQUE INDEX \"VerificationDocuments_pkey\" ON braincraze.\"VerificationDocuments\" USING btree (id)"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "bc_identity_evidence",
+      "definition": "CREATE UNIQUE INDEX bc_identity_evidence ON braincraze.\"VerificationDocuments\" USING btree (verification_id) WHERE (document_type <> 'selfie'::text)"
+    },
+    {
+      "table_name": "VerificationDocuments",
+      "name": "bc_identity_selfie",
+      "definition": "CREATE UNIQUE INDEX bc_identity_selfie ON braincraze.\"VerificationDocuments\" USING btree (verification_id) WHERE (document_type = 'selfie'::text)"
+    },
+    {
+      "table_name": "account_profiles",
+      "name": "account_profiles_pkey",
+      "definition": "CREATE UNIQUE INDEX account_profiles_pkey ON braincraze.account_profiles USING btree (user_id)"
+    },
+    {
+      "table_name": "account_security",
+      "name": "account_security_pkey",
+      "definition": "CREATE UNIQUE INDEX account_security_pkey ON braincraze.account_security USING btree (user_id)"
+    },
+    {
+      "table_name": "admin_audit",
+      "name": "admin_audit_pkey",
+      "definition": "CREATE UNIQUE INDEX admin_audit_pkey ON braincraze.admin_audit USING btree (id)"
+    },
+    {
+      "table_name": "billing_customers",
+      "name": "billing_customers_pkey",
+      "definition": "CREATE UNIQUE INDEX billing_customers_pkey ON braincraze.billing_customers USING btree (user_id)"
+    },
+    {
+      "table_name": "billing_customers",
+      "name": "billing_customers_stripe_customer_id_key",
+      "definition": "CREATE UNIQUE INDEX billing_customers_stripe_customer_id_key ON braincraze.billing_customers USING btree (stripe_customer_id)"
+    },
+    {
+      "table_name": "challenges",
+      "name": "bc_challenge_hash",
+      "definition": "CREATE INDEX bc_challenge_hash ON braincraze.challenges USING btree (token_hash)"
+    },
+    {
+      "table_name": "challenges",
+      "name": "challenges_pkey",
+      "definition": "CREATE UNIQUE INDEX challenges_pkey ON braincraze.challenges USING btree (user_id, kind)"
+    },
+    {
+      "table_name": "friendships",
+      "name": "bc_friend_pair",
+      "definition": "CREATE UNIQUE INDEX bc_friend_pair ON braincraze.friendships USING btree (LEAST(requester_id, recipient_id), GREATEST(requester_id, recipient_id))"
+    },
+    {
+      "table_name": "friendships",
+      "name": "friendships_pkey",
+      "definition": "CREATE UNIQUE INDEX friendships_pkey ON braincraze.friendships USING btree (requester_id, recipient_id)"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "name": "bc_human_challenge_session",
+      "definition": "CREATE INDEX bc_human_challenge_session ON braincraze.human_verification_challenges USING btree (session_id)"
+    },
+    {
+      "table_name": "human_verification_challenges",
+      "name": "human_verification_challenges_pkey",
+      "definition": "CREATE UNIQUE INDEX human_verification_challenges_pkey ON braincraze.human_verification_challenges USING btree (id)"
+    },
+    {
+      "table_name": "human_verification_tokens",
+      "name": "human_verification_tokens_pkey",
+      "definition": "CREATE UNIQUE INDEX human_verification_tokens_pkey ON braincraze.human_verification_tokens USING btree (token_hash)"
+    },
+    {
+      "table_name": "identities",
+      "name": "identities_pkey",
+      "definition": "CREATE UNIQUE INDEX identities_pkey ON braincraze.identities USING btree (provider, subject)"
+    },
+    {
+      "table_name": "identity_review_logs",
+      "name": "identity_review_logs_pkey",
+      "definition": "CREATE UNIQUE INDEX identity_review_logs_pkey ON braincraze.identity_review_logs USING btree (id)"
+    },
+    {
+      "table_name": "identity_verifications",
+      "name": "bc_identity_active",
+      "definition": "CREATE UNIQUE INDEX bc_identity_active ON braincraze.identity_verifications USING btree (user_id) WHERE (status = ANY (ARRAY['collecting'::text, 'pending_review'::text, 'under_review'::text, 'additional_information_required'::text]))"
+    },
+    {
+      "table_name": "identity_verifications",
+      "name": "identity_verifications_pkey",
+      "definition": "CREATE UNIQUE INDEX identity_verifications_pkey ON braincraze.identity_verifications USING btree (id)"
+    },
+    {
+      "table_name": "languages",
+      "name": "languages_code_key",
+      "definition": "CREATE UNIQUE INDEX languages_code_key ON braincraze.languages USING btree (code)"
+    },
+    {
+      "table_name": "languages",
+      "name": "languages_pkey",
+      "definition": "CREATE UNIQUE INDEX languages_pkey ON braincraze.languages USING btree (id)"
+    },
+    {
+      "table_name": "listings",
+      "name": "listings_pkey",
+      "definition": "CREATE UNIQUE INDEX listings_pkey ON braincraze.listings USING btree (id)"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "name": "localized_email_queue_deduplication_key_key",
+      "definition": "CREATE UNIQUE INDEX localized_email_queue_deduplication_key_key ON braincraze.localized_email_queue USING btree (deduplication_key)"
+    },
+    {
+      "table_name": "localized_email_queue",
+      "name": "localized_email_queue_pkey",
+      "definition": "CREATE UNIQUE INDEX localized_email_queue_pkey ON braincraze.localized_email_queue USING btree (id)"
+    },
+    {
+      "table_name": "messages",
+      "name": "messages_pkey",
+      "definition": "CREATE UNIQUE INDEX messages_pkey ON braincraze.messages USING btree (id)"
+    },
+    {
+      "table_name": "mfa_logins",
+      "name": "mfa_logins_pkey",
+      "definition": "CREATE UNIQUE INDEX mfa_logins_pkey ON braincraze.mfa_logins USING btree (token_hash)"
+    },
+    {
+      "table_name": "oauth_flows",
+      "name": "oauth_flows_pkey",
+      "definition": "CREATE UNIQUE INDEX oauth_flows_pkey ON braincraze.oauth_flows USING btree (state_hash)"
+    },
+    {
+      "table_name": "oauth_profiles",
+      "name": "oauth_profiles_pkey",
+      "definition": "CREATE UNIQUE INDEX oauth_profiles_pkey ON braincraze.oauth_profiles USING btree (token_hash)"
+    },
+    {
+      "table_name": "onboarding_progress",
+      "name": "onboarding_progress_pkey",
+      "definition": "CREATE UNIQUE INDEX onboarding_progress_pkey ON braincraze.onboarding_progress USING btree (user_id)"
+    },
+    {
+      "table_name": "posts",
+      "name": "posts_pkey",
+      "definition": "CREATE UNIQUE INDEX posts_pkey ON braincraze.posts USING btree (id)"
+    },
+    {
+      "table_name": "rate_limits",
+      "name": "rate_limits_pkey",
+      "definition": "CREATE UNIQUE INDEX rate_limits_pkey ON braincraze.rate_limits USING btree (key)"
+    },
+    {
+      "table_name": "school_email_domains",
+      "name": "school_email_domains_domain_key",
+      "definition": "CREATE UNIQUE INDEX school_email_domains_domain_key ON braincraze.school_email_domains USING btree (domain)"
+    },
+    {
+      "table_name": "school_email_domains",
+      "name": "school_email_domains_pkey",
+      "definition": "CREATE UNIQUE INDEX school_email_domains_pkey ON braincraze.school_email_domains USING btree (id)"
+    },
+    {
+      "table_name": "school_review_logs",
+      "name": "school_review_logs_pkey",
+      "definition": "CREATE UNIQUE INDEX school_review_logs_pkey ON braincraze.school_review_logs USING btree (id)"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "bc_active_school_request",
+      "definition": "CREATE UNIQUE INDEX bc_active_school_request ON braincraze.school_verification_requests USING btree (user_id) WHERE (status = ANY (ARRAY['awaiting_email'::text, 'pending_review'::text, 'needs_information'::text]))"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "bc_school_requests_user",
+      "definition": "CREATE INDEX bc_school_requests_user ON braincraze.school_verification_requests USING btree (user_id, submitted_at DESC)"
+    },
+    {
+      "table_name": "school_verification_requests",
+      "name": "school_verification_requests_pkey",
+      "definition": "CREATE UNIQUE INDEX school_verification_requests_pkey ON braincraze.school_verification_requests USING btree (id)"
+    },
+    {
+      "table_name": "schools",
+      "name": "schools_name_key",
+      "definition": "CREATE UNIQUE INDEX schools_name_key ON braincraze.schools USING btree (name)"
+    },
+    {
+      "table_name": "schools",
+      "name": "schools_pkey",
+      "definition": "CREATE UNIQUE INDEX schools_pkey ON braincraze.schools USING btree (id)"
+    },
+    {
+      "table_name": "sessions",
+      "name": "bc_sessions_user",
+      "definition": "CREATE INDEX bc_sessions_user ON braincraze.sessions USING btree (user_id)"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_pkey",
+      "definition": "CREATE UNIQUE INDEX sessions_pkey ON braincraze.sessions USING btree (id)"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_token_hash_key",
+      "definition": "CREATE UNIQUE INDEX sessions_token_hash_key ON braincraze.sessions USING btree (token_hash)"
+    },
+    {
+      "table_name": "stripe_events",
+      "name": "stripe_events_pkey",
+      "definition": "CREATE UNIQUE INDEX stripe_events_pkey ON braincraze.stripe_events USING btree (id)"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_pkey",
+      "definition": "CREATE UNIQUE INDEX subscriptions_pkey ON braincraze.subscriptions USING btree (user_id)"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_stripe_subscription_id_key",
+      "definition": "CREATE UNIQUE INDEX subscriptions_stripe_subscription_id_key ON braincraze.subscriptions USING btree (stripe_subscription_id)"
+    },
+    {
+      "table_name": "translation_audit",
+      "name": "translation_audit_pkey",
+      "definition": "CREATE UNIQUE INDEX translation_audit_pkey ON braincraze.translation_audit USING btree (id)"
+    },
+    {
+      "table_name": "translation_keys",
+      "name": "translation_keys_pkey",
+      "definition": "CREATE UNIQUE INDEX translation_keys_pkey ON braincraze.translation_keys USING btree (translation_key)"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_pkey",
+      "definition": "CREATE UNIQUE INDEX translation_reports_pkey ON braincraze.translation_reports USING btree (id)"
+    },
+    {
+      "table_name": "translation_reports",
+      "name": "translation_reports_queue_idx",
+      "definition": "CREATE INDEX translation_reports_queue_idx ON braincraze.translation_reports USING btree (status, created_at)"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_language_id_translation_key_key",
+      "definition": "CREATE UNIQUE INDEX translations_language_id_translation_key_key ON braincraze.translations USING btree (language_id, translation_key)"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_pkey",
+      "definition": "CREATE UNIQUE INDEX translations_pkey ON braincraze.translations USING btree (id)"
+    },
+    {
+      "table_name": "translations",
+      "name": "translations_review_idx",
+      "definition": "CREATE INDEX translations_review_idx ON braincraze.translations USING btree (language_id, review_status)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_email_key",
+      "definition": "CREATE UNIQUE INDEX users_email_key ON braincraze.users USING btree (email)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_pkey",
+      "definition": "CREATE UNIQUE INDEX users_pkey ON braincraze.users USING btree (id)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_username_key",
+      "definition": "CREATE UNIQUE INDEX users_username_key ON braincraze.users USING btree (username)"
+    }
+  ],
+  "views": [
+    {
+      "name": "verification_badges",
+      "definition": " SELECT u.id AS user_id,\n    u.verified_school_role AS role,\n    u.verified_school_id AS school_id\n   FROM (braincraze.users u\n     JOIN braincraze.schools s ON (((s.id = u.verified_school_id) AND s.active)))\n  WHERE ((u.account_status = 'active'::text) AND (u.email_verified_at IS NOT NULL) AND u.human_verified AND u.school_verified AND ((NOT u.onboarding_required) OR (u.identity_verification_status = 'verified'::text)) AND (EXISTS ( SELECT 1\n           FROM braincraze.school_verification_requests r\n          WHERE ((r.user_id = u.id) AND (r.status = 'approved'::text) AND (r.school_id = u.verified_school_id) AND (r.role = u.verified_school_role) AND (r.approved_at IS NOT NULL)))));"
+    }
+  ],
+  "policies": [
+    {
+      "table_name": "account_security",
+      "name": "bc_security_owner",
+      "cmd": "ALL",
+      "qual": "(user_id = (NULLIF(current_setting('app.user_id'::text, true), ''::text))::uuid)",
+      "with_check": null
+    },
+    {
+      "table_name": "messages",
+      "name": "bc_message_participants",
+      "cmd": "ALL",
+      "qual": "((user_id = (NULLIF(current_setting('app.user_id'::text, true), ''::text))::uuid) OR (recipient_id = (NULLIF(current_setting('app.user_id'::text, true), ''::text))::uuid))",
+      "with_check": "(user_id = (NULLIF(current_setting('app.user_id'::text, true), ''::text))::uuid)"
+    }
+  ]
+}

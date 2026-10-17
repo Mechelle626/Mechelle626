@@ -1,3 +1,4 @@
+import { message as bcText } from "../i18n/source";
 import { db } from "../auth/db";
 import { accessFor, allowed } from "../platform/access";
 import { requireIdentity } from "./flow";
@@ -17,62 +18,62 @@ export async function discover(userId: string) {
     (!user.onboarding_required ||
       user.identity_verification_status === "verified");
   const entries = [
-    { name: "Dashboard", href: "/account", implemented: true },
+    { name: bcText("ui.67b696468610b879"), href: "/account", implemented: true },
     {
-      name: "Profile Customization",
+      name: bcText("ui.bdf86fd62ef70619"),
       href: "/settings",
       implemented: true,
       beforeActivation: true,
     },
-    { name: "Basic Study Buddy", href: "/account", implemented: true },
-    { name: "Note Sharing", href: null, implemented: false },
-    { name: "Communities", href: null, implemented: false },
-    { name: "Campus posts", href: "/posts", implemented: true },
-    { name: "Messaging", href: "/messages", implemented: true },
+    { name: bcText("ui.e3b995d4683ace64"), href: "/account", implemented: true },
+    { name: bcText("ui.4eff8bea13ea0dad"), href: null, implemented: false },
+    { name: bcText("ui.c864f329f5dde534"), href: null, implemented: false },
+    { name: bcText("ui.7eafe7f52a028431"), href: "/posts", implemented: true },
+    { name: bcText("ui.eebdbb25cbbc7651"), href: "/messages", implemented: true },
     {
-      name: "Study Partner Matching",
+      name: bcText("ui.6239c61aff061d83"),
       href: "/features/matching",
       feature: "matching" as const,
       implemented: true,
     },
     {
-      name: "Marketplace",
+      name: bcText("ui.c608981d8d68fa4f"),
       href: "/marketplace",
       feature: "marketplace" as const,
       implemented: true,
     },
     {
-      name: "Marketplace Selling",
+      name: bcText("ui.012e7d7b4a0f5d42"),
       href: "/marketplace",
       feature: "selling" as const,
       implemented: true,
     },
     {
-      name: "Tutor Listings",
+      name: bcText("ui.184b02303005a13b"),
       href: "/features/tutors",
       feature: "tutors" as const,
       implemented: true,
     },
     {
-      name: "Advanced Themes",
+      name: bcText("ui.75c0e0321bd436f8"),
       href: "/features/themes",
       feature: "themes" as const,
       implemented: true,
     },
     {
-      name: "Study Buddy Skins",
+      name: bcText("ui.8c76afefde5e77a4"),
       href: "/features/study-buddies",
       feature: "study-buddies" as const,
       implemented: true,
     },
     {
-      name: "Analytics",
+      name: bcText("ui.94c116ee118a7299"),
       href: "/features/analytics",
       feature: "analytics" as const,
       implemented: true,
     },
     { name: "GPA Tools", href: null, implemented: false },
-    { name: "Club Finder", href: null, implemented: false },
+    { name: bcText("ui.d99968badbd9baee"), href: null, implemented: false },
   ];
   return {
     accountType: user.role,

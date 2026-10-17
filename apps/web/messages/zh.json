@@ -65,5 +65,7 @@
   "email.notification.subject": "BrainCraze 通知",
   "email.notification.body": "您在 BrainCraze 中有新的动态。请登录查看：{0}",
   "ui.798ca2ce18bf2038": "创建账户",
-  "ui.86033f75a4c0876a": "创建账户"
+  "ui.86033f75a4c0876a": "创建账户",
+  "email.security.subject": "BrainCraze 安全通知",
+  "email.security.body": "您的 BrainCraze 密码或双重身份验证设置已更改。如果不是您本人进行的更改，请立即检查账户安全：{0}"
 }

@@ -65,5 +65,7 @@
   "email.notification.subject": "Notificación de BrainCraze",
   "email.notification.body": "Tienes una nueva actualización en BrainCraze. Inicia sesión para verla: {0}",
   "ui.798ca2ce18bf2038": "Crear cuenta",
-  "ui.86033f75a4c0876a": "Crear cuenta"
+  "ui.86033f75a4c0876a": "Crear cuenta",
+  "email.security.subject": "Notificación de seguridad de BrainCraze",
+  "email.security.body": "Tu contraseña o la configuración de autenticación en dos pasos de BrainCraze ha cambiado. Si no realizaste este cambio, revisa inmediatamente la seguridad de tu cuenta: {0}"
 }

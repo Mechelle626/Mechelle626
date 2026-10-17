@@ -1,3 +1,4 @@
+import {queueSecurityNotice} from "../auth/security-notifications";
 import { message as bcText } from "../i18n/source";
 import {
   createCipheriv,
@@ -142,6 +143,7 @@ export async function enableMfa(id: string, sessionId: string, code: string) {
       "UPDATE braincraze.sessions SET mfa_verified_at=now() WHERE id=$1 AND user_id=$2",
       [sessionId, id],
     );
+    await queueSecurityNotice(client,id,"two_factor_enabled");
     return codes;
   });
 }

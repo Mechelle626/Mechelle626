@@ -18,7 +18,7 @@ for(const file of [...await files('apps/web/components'),...await files('apps/we
  const excluded=['ImportDeclaration','ImportSpecifier','ExportNamedDeclaration','ExportAllDeclaration','TSLiteralType'].includes(p?.type)||(p?.type==='ObjectProperty'&&p.key===n&&!p.computed);
  const codeValue=attr&&!label;
  const uiCopy=ui&&human(n.value)&&!excluded&&!codeValue;
- const serverCopy=!ui&&!excluded&&(p?.type==='NewExpression'&&p.callee?.name==='AuthError'&&p.arguments[1]===n||p?.type==='ObjectProperty'&&['message','error','title','description','label'].includes(p.key?.name??p.key?.value));
+ const serverCopy=!ui&&!excluded&&(p?.type==='NewExpression'&&p.callee?.name==='AuthError'&&p.arguments[1]===n||p?.type==='ObjectProperty'&&(['message','error','title','description','label','name','tag','button','note'].includes(p.key?.name??p.key?.value)||file.endsWith('/onboarding/contracts.ts'))||p?.type==='CallExpression'&&p.callee?.type==='MemberExpression'&&['min','max','regex'].includes(p.callee.property?.name)&&p.arguments.includes(n));
  if(label&&/[A-Za-z]/.test(n.value)||uiCopy||serverCopy&&human(n.value)){add(n,n.value,attr);return;}
  }
  for(const [k,v]of Object.entries(n))if(!['loc','extra','comments'].includes(k)){if(Array.isArray(v))v.forEach(x=>walk(x,n));else walk(v,n);}

@@ -50,6 +50,7 @@ export default async function DashboardShell({
               ))}
               {user.is_admin && (
                 <>
+                  <Link href="/admin/overview">{bcText("ui.bf63fb693f7a583f")}</Link>
                   <Link href="/admin/verifications">{bcText("ui.3e33337bc100d7e3")}</Link>
                   <Link href="/admin/identity">{bcText("ui.99398ad54b9895da")}</Link>
                   <Link href="/admin/localization">{bcText("ui.7f172f7e5696fa16")}</Link>

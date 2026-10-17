@@ -17,7 +17,7 @@ import { documentTypes, type IdentityStatus } from "./contracts";
 export async function identityStatus(id: string): Promise<IdentityStatus> {
   const u = (
     await db.query(
-      "SELECT onboarding_required,identity_verification_status,selfie_verification_status FROM braincraze.users WHERE id=$1",
+      "SELECT onboarding_required,email_verified_at,human_verified,identity_verification_status,selfie_verification_status FROM braincraze.users WHERE id=$1",
       [id],
     )
   ).rows[0];
@@ -37,6 +37,7 @@ export async function identityStatus(id: string): Promise<IdentityStatus> {
       ).rows
     : [];
   return {
+    checklist: {email:!!u.email_verified_at,human:!!u.human_verified,selfie:documents.some(d=>d.type==="selfie"),document:documents.some(d=>d.type!=="selfie"),scanned:documents.length===2&&documents.every(d=>d.scanStatus==="clean"),approved:u.identity_verification_status==="verified"},
     required: u.onboarding_required,
     status: u.identity_verification_status,
     selfieStatus: u.selfie_verification_status,

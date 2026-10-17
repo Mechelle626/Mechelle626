@@ -65,5 +65,7 @@
   "email.notification.subject": "إشعار BrainCraze",
   "email.notification.body": "لديك تحديث جديد في BrainCraze. سجل الدخول لعرضه: {0}",
   "ui.798ca2ce18bf2038": "إنشاء حساب",
-  "ui.86033f75a4c0876a": "إنشاء حساب"
+  "ui.86033f75a4c0876a": "إنشاء حساب",
+  "email.security.subject": "إشعار أمان BrainCraze",
+  "email.security.body": "تم تغيير كلمة مرور BrainCraze أو إعدادات المصادقة الثنائية. إذا لم تُجرِ هذا التغيير، فراجع أمان حسابك فورًا: {0}"
 }

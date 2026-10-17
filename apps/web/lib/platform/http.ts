@@ -1,3 +1,4 @@
+import {validationFields} from "../i18n/validation";
 import { message as bcText } from "../i18n/source";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -48,7 +49,7 @@ export function failure(error: unknown) {
     return json(
       {
         error: bcText("ui.4a3ac9bb1378a7e9"),
-        fields: z.flattenError(error).fieldErrors,
+        fields: validationFields(error),
       },
       400,
     );

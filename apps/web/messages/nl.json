@@ -65,5 +65,7 @@
   "email.notification.subject": "BrainCraze-melding",
   "email.notification.body": "Je hebt een nieuwe update in BrainCraze. Meld je aan om deze te bekijken: {0}",
   "ui.798ca2ce18bf2038": "Account aanmaken",
-  "ui.86033f75a4c0876a": "Account aanmaken"
+  "ui.86033f75a4c0876a": "Account aanmaken",
+  "email.security.subject": "BrainCraze-beveiligingsmelding",
+  "email.security.body": "Je BrainCraze-wachtwoord of instellingen voor tweestapsverificatie zijn gewijzigd. Controleer direct je accountbeveiliging als je deze wijziging niet hebt aangebracht: {0}"
 }
