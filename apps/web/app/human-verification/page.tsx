@@ -1,6 +1,7 @@
-import { localizedMetadata } from '../../lib/i18n/metadata';
+import OnboardingJourney from "../../components/onboarding-journey";
+import { localizedMetadata } from "../../lib/i18n/metadata";
 import { message as bcText } from "../../lib/i18n/source";
-import { Localized } from '../../components/localization';
+import { Localized } from "../../components/localization";
 import { redirect } from "next/navigation";
 import { AuthShell } from "../../components/auth-shell";
 import HumanVerification from "../../components/human-verification";
@@ -12,10 +13,19 @@ export default async function Page() {
   if (!user) redirect("/login");
   if (!user.email_verified_at) redirect("/verify-email");
   return (
-    <Localized>{<AuthShell mode="human-verification">
-      <HumanVerification identityRequired={Boolean(user.onboarding_required)}/>
-    </AuthShell>}</Localized>
+    <Localized>
+      {
+        <AuthShell mode="human-verification">
+          <OnboardingJourney user={user} />
+          <HumanVerification
+            identityRequired={Boolean(user.onboarding_required)}
+          />
+        </AuthShell>
+      }
+    </Localized>
   );
 }
 
-export async function generateMetadata(){return localizedMetadata(metadata);}
+export async function generateMetadata() {
+  return localizedMetadata(metadata);
+}

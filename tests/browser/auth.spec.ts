@@ -43,6 +43,13 @@ test("desktop signup → verify → sessions → logout → login → forgot →
   await expect(
     page.getByRole("heading", { name: "Find your kind of brilliant." }),
   ).toBeVisible();
+  const journey = page.getByRole("navigation", {
+    name: "Your signup and verification progress",
+  });
+  await expect(journey.locator('[aria-current="step"]')).toContainText(
+    "Create account",
+  );
+  await expect(journey.locator('[data-state="locked"]')).toHaveCount(3);
   await page.getByLabel("First name", { exact: true }).fill("Katherine");
   await page.getByLabel("Last name", { exact: true }).fill("Johnson");
   await page.getByLabel("Username", { exact: true }).fill(`browser_${id}`);
@@ -73,10 +80,27 @@ test("desktop signup → verify → sessions → logout → login → forgot →
     path: "test-results/signup-desktop.png",
     fullPage: true,
   });
+  const registration = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/auth/register") &&
+      response.request().method() === "POST",
+  );
   await page
     .getByRole("button", { name: "Create account", exact: true })
     .click();
+  const registered = await registration;
+  expect(
+    registered.status(),
+    "Registration must succeed before email verification",
+  ).toBe(201);
   await page.waitForURL("**/verify-email");
+  await expect(journey.locator('[aria-current="step"]')).toContainText(
+    "Verify email",
+  );
+  await expect(journey.locator('[data-state="complete"]')).toHaveCount(1);
+  // Returning to signup resumes the saved server-side flow rather than creating another account.
+  await page.goto("/signup");
+  await expect(page).toHaveURL(/\/verify-email$/);
   const verification = await mailFor(email, "Verify your BrainCraze email");
   const code = verification.text.match(/code is (\d{6})/)[1];
   await page.getByLabel("Verification code", { exact: true }).fill(code);
@@ -169,7 +193,18 @@ test("mobile screens fit, controls are labeled, and missing reset token fails cl
     "/reset-password",
   ]) {
     await page.goto(path);
-    await expect(page.locator("h2")).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: {
+          "/signup": "Find your kind of brilliant.",
+          "/login": "Hello again, bright mind.",
+          "/forgot-password": "A fresh start.",
+          "/reset-password": "New password. Same you.",
+        }[path],
+        exact: true,
+        level: 2,
+      }),
+    ).toBeVisible();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth,

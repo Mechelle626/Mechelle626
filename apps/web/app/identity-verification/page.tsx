@@ -1,4 +1,5 @@
-import { localizedMetadata } from '../../lib/i18n/metadata';
+import OnboardingJourney from "../../components/onboarding-journey";
+import { localizedMetadata } from "../../lib/i18n/metadata";
 import { message as bcText } from "../../lib/i18n/source";
 import { Localized } from "../../components/localization";
 import { redirect } from "next/navigation";
@@ -16,6 +17,7 @@ export default async function Page() {
     <Localized>
       {
         <AuthShell mode="school-verification">
+          <OnboardingJourney user={user} />
           <IdentityVerification />
         </AuthShell>
       }
@@ -23,4 +25,6 @@ export default async function Page() {
   );
 }
 
-export async function generateMetadata(){return localizedMetadata(metadata);}
+export async function generateMetadata() {
+  return localizedMetadata(metadata);
+}

@@ -128,7 +128,10 @@ test("landing precedes authentication, persists a language choice and supports a
       await readFile(`apps/web/messages/${code}.json`, "utf8"),
     );
     await expect(
-      page.getByRole("link", { name: catalog["ui.9d6322c1f4d9d3f3"] ?? "Login", exact: true }),
+      page.getByRole("link", {
+        name: catalog["ui.9d6322c1f4d9d3f3"] ?? "Login",
+        exact: true,
+      }),
     ).toHaveAttribute("href", "/login");
   }
   await page.locator(".locale-bar select").selectOption("ar");
@@ -216,6 +219,37 @@ test("localized registration preserves canonical role values and supports manual
     preferred_language: "fr",
     onboarding_required: true,
   });
+});
+
+test("saved review states stay incomplete in the progress guide and signup resumes identity review", async ({
+  page,
+  context,
+}) => {
+  const user = await member(context);
+  for (const [status, message] of [
+    ["pending_review", "Your submission is awaiting a human decision."],
+    ["rejected", "Review the decision and submit replacement evidence"],
+    [
+      "additional_information_required",
+      "A reviewer requested more information.",
+    ],
+  ]) {
+    // Isolated persisted fixtures exercise display states, not a real review decision.
+    await pool.query(
+      "UPDATE braincraze.users SET identity_verification_status=$2 WHERE id=$1",
+      [user.id, status],
+    );
+    await page.goto("/signup");
+    await expect(page).toHaveURL(/\/identity-verification$/);
+    const guide = page.getByRole("navigation", {
+      name: "Your signup and verification progress",
+    });
+    await expect(guide).toContainText(message);
+    await expect(guide.locator('[data-state="complete"]')).toHaveCount(3);
+    await expect(guide.locator('[aria-current="step"]')).toContainText(
+      "Identity review",
+    );
+  }
 });
 
 test("selfie camera denial blocks progress without offering a selfie file upload", async ({

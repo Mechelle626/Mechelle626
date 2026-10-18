@@ -1180,5 +1180,18 @@
   "ui.84b745202ad0f0c5": "Uploaded files alone do not grant approval. If more information is required, follow the reviewer’s message and resubmit your evidence.",
   "ui.a349d1c31b5a10f1": "Review account activity, subscription records, and service configuration.",
   "validation.invalid": "Please check this field.",
-  "ui.99ab2e7288e51c61": "Configuration presence does not prove live service operation. No external requests were made."
+  "ui.99ab2e7288e51c61": "Configuration presence does not prove live service operation. No external requests were made.",
+  "onboarding.journey.title": "Your signup and verification progress",
+  "onboarding.journey.account": "Create account",
+  "onboarding.journey.email": "Verify email",
+  "onboarding.journey.human": "Human verification",
+  "onboarding.journey.identity": "Identity review",
+  "onboarding.journey.school": "School affiliation review",
+  "onboarding.journey.complete": "Completed",
+  "onboarding.journey.current": "Next step",
+  "onboarding.journey.locked": "Complete the earlier steps first",
+  "onboarding.journey.pending": "Your submission is awaiting a human decision. Submitting an ID does not mean your identity has been approved.",
+  "onboarding.journey.rejected": "Review the decision and submit replacement evidence to continue.",
+  "onboarding.journey.more": "A reviewer requested more information. Open your verification screen for the request.",
+  "onboarding.journey.notice": "Email verification, a human check, and identity review are separate steps. Your selected role and school are self-reported until affiliation is approved."
 }
