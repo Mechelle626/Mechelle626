@@ -1,0 +1,2220 @@
+From a06971a502cefa32b45ecf41d610d081a52f6f34 Mon Sep 17 00:00:00 2001
+From: Win Nwa <michelle4nwa@gmail.com>
+Date: Sun, 18 Oct 2026 04:16:57 +0000
+Subject: [PATCH] feat(auth): port signup and saved verification flow to Expo
+
+---
+ README.md                                     |   4 +
+ docs/expo-signup-verification-port.md         |  89 +++++++
+ scripts/test-verification-progress.mjs        | 102 ++++++++
+ src/__tests__/auth-api.test.ts                |  48 ++++
+ src/__tests__/auth-flow.test.tsx              | 102 ++++++++
+ src/__tests__/id-resume.test.tsx              |  63 +++++
+ src/__tests__/id-submission.test.ts           |  58 +++++
+ src/__tests__/progress-screen.test.tsx        |  97 ++++++++
+ src/__tests__/registration.test.ts            |  35 +++
+ src/__tests__/route-guards.test.tsx           |  38 +++
+ src/__tests__/session.test.tsx                |  90 +++++++
+ src/__tests__/verificationProgress.test.ts    |  99 ++++++++
+ src/app/_layout.tsx                           |  21 +-
+ src/app/index.tsx                             |  12 +-
+ src/app/verify-email.tsx                      | 115 +++++++++
+ src/app/verify-id.tsx                         | 230 +++++++++++++-----
+ src/components/AuthForm.tsx                   | 138 +++++++++--
+ src/components/VerificationProgress.tsx       | 127 ++++++++++
+ src/content/onboarding.ts                     |  24 ++
+ src/lib/auth.ts                               |  16 +-
+ src/lib/idVerification.ts                     |  78 ++++--
+ src/lib/registration.ts                       |  25 ++
+ src/lib/session.tsx                           |  53 +++-
+ src/lib/verificationProgress.ts               |  73 ++++++
+ .../migrations/004_verification_progress.sql  |  29 +++
+ 25 files changed, 1654 insertions(+), 112 deletions(-)
+ create mode 100644 docs/expo-signup-verification-port.md
+ create mode 100644 scripts/test-verification-progress.mjs
+ create mode 100644 src/__tests__/auth-api.test.ts
+ create mode 100644 src/__tests__/auth-flow.test.tsx
+ create mode 100644 src/__tests__/id-resume.test.tsx
+ create mode 100644 src/__tests__/id-submission.test.ts
+ create mode 100644 src/__tests__/progress-screen.test.tsx
+ create mode 100644 src/__tests__/registration.test.ts
+ create mode 100644 src/__tests__/route-guards.test.tsx
+ create mode 100644 src/__tests__/session.test.tsx
+ create mode 100644 src/__tests__/verificationProgress.test.ts
+ create mode 100644 src/app/verify-email.tsx
+ create mode 100644 src/components/VerificationProgress.tsx
+ create mode 100644 src/content/onboarding.ts
+ create mode 100644 src/lib/registration.ts
+ create mode 100644 src/lib/verificationProgress.ts
+ create mode 100644 supabase/migrations/004_verification_progress.sql
+
+diff --git a/README.md b/README.md
+index 242934b..aea5242 100644
+--- a/README.md
++++ b/README.md
+@@ -54,3 +54,7 @@ Join our community of developers creating universal apps.
+ 
+ - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+ - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
++
++## Expo signup and verification integration
++
++See [the native Expo port and audit](docs/expo-signup-verification-port.md) for the signup improvements, saved review progress, required Supabase migration, test results and deployment limitations. This integrates the flow into `src/`; it does not import a Next.js app under `export/`.
+diff --git a/docs/expo-signup-verification-port.md b/docs/expo-signup-verification-port.md
+new file mode 100644
+index 0000000..2f3856a
+--- /dev/null
++++ b/docs/expo-signup-verification-port.md
+@@ -0,0 +1,89 @@
++# Expo signup and verification port
++
++## Target and source
++
++Target: `danieog/braincraze`, branch `feat/expo-signup-verification-flow`, based on main commit `04c7fc125e975c726741401135b3b13305cad623`.
++
++[PR #3](https://github.com/danieog/braincraze/pull/3) was already merged in commit `acce7c60d499d0d5d1bb8ee58d075dff1d4425e9`. Its `login-signup` head is `d15d96fe0565116da3fa86050359936b7613ef3b`. This port belongs in a **new pull request against main**, rather than the already merged PR.
++
++Source concepts: [Mechelle626/Mechelle626 signup-verification branch](https://github.com/Mechelle626/Mechelle626/tree/feat/signup-verification-flow), commit `e0b931fe9893f1d79e68ddb2681fd38ff1d18685`. That is a Next.js/PostgreSQL app. Its components, session cookies, database schema, server middleware, and API routes cannot be dropped into an Expo/Supabase app unchanged.
++
++The fetched `origin/mechelle-changes` points to `d4f31e6e0b36804bb8ad7bfdafc3b1e455fc3b9f`, which **adds** 152 files under `export/`. This port starts from main and does not add or delete that directory. It implements native Expo code in `src/` and one additive Supabase migration. It does not claim the entire Next.js application has been merged.
++
++## Completed and locally verified
++
++- Signup password confirmation, 12–128 character client validation, password visibility, length/variety guidance, labeled inputs and a scrollable mobile form. Existing login passwords remain supported.
++- Signup confirmation copy distinguishes account creation from school affiliation approval. Passwords are cleared after successful signup.
++- A confirmation-email resend screen using Supabase Auth, a 60-second UI cooldown, validation, provider-error display and generic success copy. A successful API call is described as an email request, not proof of delivery.
++- Session state records the Supabase user's email-confirmation flag. Protected Expo routes require a signed-in, confirmed-email session. Existing database authorization remains authoritative; local UI flags do not grant backend permissions.
++- A late session-restore response cannot overwrite a newer authentication event. Restore failures display an error.
++- Four-step saved progress: account, email, ID submission and school-affiliation review. Only the first unfinished step has a Continue link. Signed-in visitors resume from the home screen instead of creating another account.
++- A read-only owner-selected progress RPC. It returns only email/affiliation booleans and the latest review state, not email addresses, document paths, internal AI findings, or another account's data.
++- Queued/manual review remains incomplete; rejection and reupload resume evidence collection. Reopening the ID screen restores saved status and hides duplicate-upload controls for pending requests.
++- When storage and queue recording succeed but the auxiliary check invocation fails, the upload remains saved and the UI explicitly reports the check failure. It does not invent a successful scan or approval.
++- ID retention copy now acknowledges that deletion is attempted after review and that failures need administrator follow-up. Existing private storage and manual-review functions remain in use.
++
++## Database and API changes
++
++Apply `supabase/migrations/004_verification_progress.sql` after migrations 001–003 in the intended Supabase project. It creates `public.my_verification_progress()`:
++
++- No parameters: ownership comes from `auth.uid()`.
++- `SECURITY DEFINER`, fixed search path, fully qualified table references.
++- Anonymous/public execution revoked; authenticated execution granted.
++- Missing identity rejected; no profile, trust, role, badge or request writes.
++- Returns `email_verified`, `school_verified`, `review_status` as JSON.
++
++No tables or columns were added. Existing RLS policies and service-role secrets were not changed. Existing RPCs and the `verify-id` Edge Function are reused. `submitId()` now returns `{ requestId, checkInvocationFailed }`; its one application caller was updated. `resendConfirmation()` wraps Supabase Auth's signup-email resend API.
++
++If migration 004 has not been applied, progress displays the real error with a retry action; it never fabricates a completed state. **This migration has not been applied to a live Supabase project by this task.**
++
++## Reproduce checks
++
++Node 24 and the committed package lock were used. No application dependencies or lockfiles were changed.
++
++```sh
++npm ci --cache /tmp/braincraze-npm-cache --no-audit --no-fund
++EXPO_NO_TELEMETRY=1 npm run lint
++./node_modules/.bin/tsc --noEmit
++npm test -- --runInBand
++EXPO_NO_TELEMETRY=1 npm run export:web
++```
++
++The explicit cache and telemetry setting accommodate this cloud sandbox's unwritable home directory. They do not relax artifact integrity, TLS, or application security.
++
++The SQL fixture uses real PostgreSQL via PGlite, installed outside the application. It creates minimal auth/profile/request fixtures in a disposable database and never connects to hosted Supabase:
++
++```sh
++npm install --prefix /tmp/braincraze-sql-test --cache /tmp/braincraze-npm-cache --no-package-lock --no-save @electric-sql/pglite@0.5.10
++node scripts/test-verification-progress.mjs /tmp/braincraze-sql-test/node_modules/@electric-sql/pglite/dist/index.js
++```
++
++## Test results
++
++- Baseline Jest suite: 74 passed across 6 suites.
++- Final Jest suite: **107 passed across 15 suites**, zero failing/skipped/todo tests.
++- TypeScript: passed.
++- Expo lint: passed with five existing warnings in earlier landing/location tests; zero errors and no new warnings.
++- Expo web export: passed. This validates bundling, not live authentication or a production deployment.
++- SQL fixture: passed anonymous denial, missing-session denial, owner isolation, no caller-selected owner, no approval writes, latest-request selection and saved email state.
++- Development failures resolved: sandbox npm cache/Expo telemetry writes, effect lint violations, Jest mock initialization, a strict text assertion, and test-component display names. No security checks were disabled to make tests pass.
++
++All provider responses, sessions, images and review states in tests are explicit fixtures. SQL tests use a minimal schema, not the full deployed Supabase service. Native device/camera acceptance testing and live email/identity services were not performed. Official SDK 57 documentation fetches were denied by the network proxy; installed SDK types and existing project API patterns were used, then validated with type checking, tests and a web export.
++
++## Partial, blocked and missing features
++
++This is a focused signup/verification-flow port. It does not port the whole 214-file Next.js repository or satisfy every earlier platform phase.
++
++| Integration | Status and evidence |
++| --- | --- |
++| Supabase signup/login/resend | ⚠ Implemented; adapter/UI tests use fixtures. Valid project configuration, email confirmation policy, redirect allowlist and live acceptance tests remain required. |
++| Progress RPC | ⚠ Implemented and locally verified in a SQL fixture; live migration/deployment remains required. |
++| ID storage/review | ⚠ Existing implementation plus persisted progress; live bucket policies, Edge Function, reviewer privileges and deletion behavior need testing. |
++| Auxiliary Ollama ID check | ⚠ Existing server implementation; live credentials/configuration not verified. New UI reports invocation failures explicitly. |
++| Independent CAPTCHA/human check | ❌ Not implemented by this port. Existing migration 002 creates a `human_verified_at` marker on email confirmation. That marker is not proof of CAPTCHA completion. This port deliberately does not display it as a verified human check. |
++| Automated selfie liveness / face matching | ❌ Not implemented. |
++| Next.js localization/admin/billing/personal-identity features | ❌ Not ported here. New Expo source copy is English; full multilingual parity, alternative IDs and selfie workflows remain separate work. |
++
++The application's existing school-email policy still requires a configured school domain, including the ID path. Schools with empty domain lists cannot use that existing submission RPC until an operator supplies an authoritative domain policy. The new migration does not bypass it.
++
++Production security remains **partial**: independent CAPTCHA, server-enforced password policy, configured Supabase email confirmation, redirects, live RLS/storage acceptance tests, administrator security, evidence scanning and retention need review before a public launch. Client password rules and Expo navigation do not replace those controls. No payment, third-party identity service, email delivery, or deployed integration is certified by these local tests.
+diff --git a/scripts/test-verification-progress.mjs b/scripts/test-verification-progress.mjs
+new file mode 100644
+index 0000000..cc5dd20
+--- /dev/null
++++ b/scripts/test-verification-progress.mjs
+@@ -0,0 +1,102 @@
++// Disposable PostgreSQL/WASM fixture test. Never connects to a deployed Supabase project.
++// Pass the absolute path to an externally installed @electric-sql/pglite module.
++import assert from "node:assert/strict";
++import { readFile } from "node:fs/promises";
++import { pathToFileURL } from "node:url";
++if (!process.argv[2])
++  throw new Error(
++    "Pass the absolute PGlite module path; see docs/expo-signup-verification-port.md",
++  );
++const { PGlite } = await import(pathToFileURL(process.argv[2]).href);
++const db = new PGlite();
++try {
++  await db.exec(`
++    create role anon;
++    create role authenticated;
++    create schema auth;
++    create table auth.users(id uuid primary key, email_confirmed_at timestamptz);
++    create function auth.uid() returns uuid language sql stable as
++      $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
++    create table public.profiles(id uuid primary key, school_verified_at timestamptz);
++    create table public.verification_requests(id uuid primary key, user_id uuid, status text, created_at timestamptz);
++  `);
++  await db.exec(
++    await readFile(
++      new URL(
++        "../supabase/migrations/004_verification_progress.sql",
++        import.meta.url,
++      ),
++      "utf8",
++    ),
++  );
++  const owner = "00000000-0000-0000-0000-000000000001";
++  const other = "00000000-0000-0000-0000-000000000002";
++  await db.query(`insert into auth.users values($1,now()),($2,now())`, [
++    owner,
++    other,
++  ]);
++  await db.query(`insert into public.profiles values($1,null),($2,now())`, [
++    owner,
++    other,
++  ]);
++  await db.query(
++    `insert into public.verification_requests values
++    ('10000000-0000-0000-0000-000000000001',$1,'manual_review',now()),
++    ('10000000-0000-0000-0000-000000000002',$2,'approved',now())`,
++    [owner, other],
++  );
++  await db.exec("set role anon");
++  await assert.rejects(
++    db.query("select public.my_verification_progress()"),
++    /permission denied/,
++  );
++  await db.exec("set role authenticated");
++  await assert.rejects(
++    db.query("select public.my_verification_progress()"),
++    /not authenticated/,
++  );
++  await db.query(`select set_config('request.jwt.claim.sub',$1,false)`, [
++    owner,
++  ]);
++  let result = (
++    await db.query("select public.my_verification_progress() as progress")
++  ).rows[0].progress;
++  assert.deepEqual(result, {
++    email_verified: true,
++    school_verified: false,
++    review_status: "manual_review",
++  });
++  await assert.rejects(
++    db.query("select public.my_verification_progress($1)", [other]),
++    /does not exist/,
++  );
++  await assert.rejects(
++    db.query(
++      `update public.profiles set school_verified_at=now() where id=$1`,
++      [owner],
++    ),
++    /permission denied/,
++  );
++  await db.exec("reset role");
++  await db.query(`update auth.users set email_confirmed_at=null where id=$1`, [
++    owner,
++  ]);
++  await db.query(
++    `insert into public.verification_requests values ('10000000-0000-0000-0000-000000000003',$1,'needs_reupload',now()+interval '1 second')`,
++    [owner],
++  );
++  await db.exec("set role authenticated");
++  result = (
++    await db.query("select public.my_verification_progress() as progress")
++  ).rows[0].progress;
++  assert.deepEqual(result, {
++    email_verified: false,
++    school_verified: false,
++    review_status: "needs_reupload",
++  });
++  console.log(
++    "PASS: anonymous denial, missing-session denial, owner isolation, no caller-selected owner, no approval writes, latest-request selection and saved email state.",
++  );
++} finally {
++  await db.close();
++}
+diff --git a/src/__tests__/auth-api.test.ts b/src/__tests__/auth-api.test.ts
+new file mode 100644
+index 0000000..47f3fb9
+--- /dev/null
++++ b/src/__tests__/auth-api.test.ts
+@@ -0,0 +1,48 @@
++import { logIn, resendConfirmation, signUp } from "../lib/auth";
++const mockAuth = {
++  signUp: jest.fn(),
++  signInWithPassword: jest.fn(),
++  resend: jest.fn(),
++};
++jest.mock("../lib/supabase", () => ({
++  supabase: {
++    auth: {
++      signUp: (...args: unknown[]) => mockAuth.signUp(...args),
++      signInWithPassword: (...args: unknown[]) =>
++        mockAuth.signInWithPassword(...args),
++      resend: (...args: unknown[]) => mockAuth.resend(...args),
++    },
++  },
++}));
++beforeEach(() => jest.resetAllMocks());
++it("delegates signup and confirmation to Supabase without setting verification metadata", async () => {
++  mockAuth.signUp.mockResolvedValue({ error: null });
++  await signUp(" a@example.test ", "A passphrase");
++  expect(mockAuth.signUp).toHaveBeenCalledWith({
++    email: "a@example.test",
++    password: "A passphrase",
++    options: { emailRedirectTo: expect.any(String) },
++  });
++});
++it("resends via Supabase and propagates provider errors without inventing successful delivery", async () => {
++  mockAuth.resend
++    .mockResolvedValueOnce({ error: null })
++    .mockResolvedValueOnce({ error: new Error("Email rate limit exceeded") });
++  await resendConfirmation(" a@example.test ");
++  expect(mockAuth.resend).toHaveBeenCalledWith({
++    type: "signup",
++    email: "a@example.test",
++    options: { emailRedirectTo: expect.any(String) },
++  });
++  await expect(resendConfirmation("a@example.test")).rejects.toThrow(
++    "rate limit",
++  );
++});
++it("forwards credentials and returns an authentication failure to the caller", async () => {
++  mockAuth.signInWithPassword.mockResolvedValue({
++    error: new Error("Invalid login"),
++  });
++  await expect(logIn("a@example.test", "wrong")).rejects.toThrow(
++    "Invalid login",
++  );
++});
+diff --git a/src/__tests__/auth-flow.test.tsx b/src/__tests__/auth-flow.test.tsx
+new file mode 100644
+index 0000000..d97969a
+--- /dev/null
++++ b/src/__tests__/auth-flow.test.tsx
+@@ -0,0 +1,102 @@
++import {
++  fireEvent,
++  render,
++  screen,
++  waitFor,
++} from "@testing-library/react-native";
++import { AuthForm } from "../components/AuthForm";
++import VerifyEmailScreen from "../app/verify-email";
++import { logIn, resendConfirmation, signUp } from "../lib/auth";
++
++jest.mock("../lib/auth", () => ({
++  signUp: jest.fn(),
++  logIn: jest.fn(),
++  resendConfirmation: jest.fn(),
++}));
++jest.mock("../lib/session", () => ({
++  useSession: () => ({ status: "signedOut" }),
++}));
++jest.mock("../components/VerificationProgress", () => ({
++  VerificationProgress: () => null,
++}));
++jest.mock("react-native-safe-area-context", () => ({
++  SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
++}));
++jest.mock("expo-router", () => {
++  const { Text } = jest.requireActual("react-native");
++  return {
++    Link: ({ children }: { children: React.ReactNode }) => (
++      <Text>{children}</Text>
++    ),
++  };
++});
++const signup = signUp as jest.Mock;
++const login = logIn as jest.Mock;
++const resend = resendConfirmation as jest.Mock;
++beforeEach(() => jest.resetAllMocks());
++
++it("validates confirmation before contacting Supabase, then clears passwords and explains the next step", async () => {
++  signup.mockResolvedValue(undefined);
++  await render(<AuthForm mode="signup" />);
++  await fireEvent.changeText(
++    screen.getByLabelText("Email"),
++    " a@example.test ",
++  );
++  await fireEvent.changeText(
++    screen.getByLabelText("Password"),
++    "A long signup passphrase 12!",
++  );
++  await fireEvent.changeText(
++    screen.getByLabelText("Confirm password"),
++    "A different passphrase",
++  );
++  await fireEvent.press(screen.getByRole("button", { name: "Sign up" }));
++  expect(screen.getByRole("alert")).toHaveTextContent(
++    "Passwords do not match.",
++  );
++  expect(signup).not.toHaveBeenCalled();
++  await fireEvent.changeText(
++    screen.getByLabelText("Confirm password"),
++    "A long signup passphrase 12!",
++  );
++  await fireEvent.press(screen.getByRole("button", { name: "Show password" }));
++  expect(screen.getByLabelText("Password").props.secureTextEntry).toBe(false);
++  await fireEvent.press(screen.getByRole("button", { name: "Sign up" }));
++  await waitFor(() =>
++    expect(signup).toHaveBeenCalledWith(
++      "a@example.test",
++      "A long signup passphrase 12!",
++    ),
++  );
++  expect(screen.getByText(/Creating an account does not approve/)).toBeTruthy();
++  expect(screen.getByLabelText("Password").props.value).toBe("");
++  expect(screen.getByLabelText("Confirm password").props.value).toBe("");
++});
++it("shows provider errors and preserves login support for existing passwords", async () => {
++  login.mockRejectedValue(new Error("Invalid login credentials"));
++  await render(<AuthForm mode="login" />);
++  await fireEvent.changeText(screen.getByLabelText("Email"), "a@example.test");
++  await fireEvent.changeText(screen.getByLabelText("Password"), "legacy");
++  await fireEvent.press(screen.getByRole("button", { name: "Log in" }));
++  await waitFor(() =>
++    expect(screen.getByRole("alert")).toHaveTextContent(
++      "Invalid login credentials",
++    ),
++  );
++  expect(login).toHaveBeenCalledWith("a@example.test", "legacy");
++});
++it("requests a confirmation email without granting verification and enforces the UI cooldown", async () => {
++  resend.mockResolvedValue(undefined);
++  await render(<VerifyEmailScreen />);
++  await fireEvent.changeText(screen.getByLabelText("Email"), "a@example.test");
++  await fireEvent.press(
++    screen.getByRole("button", { name: "Resend confirmation email" }),
++  );
++  await waitFor(() => expect(resend).toHaveBeenCalledWith("a@example.test"));
++  expect(screen.getByText(/If this address can be confirmed/)).toBeTruthy();
++  expect(
++    screen.getByRole("button", { name: "Resend confirmation email" }),
++  ).toBeDisabled();
++  expect(signup).not.toHaveBeenCalled();
++  expect(login).not.toHaveBeenCalled();
++});
+diff --git a/src/__tests__/id-resume.test.tsx b/src/__tests__/id-resume.test.tsx
+new file mode 100644
+index 0000000..44a61d1
+--- /dev/null
++++ b/src/__tests__/id-resume.test.tsx
+@@ -0,0 +1,63 @@
++import { render, screen, waitFor } from "@testing-library/react-native";
++import VerifyIdScreen from "../app/verify-id";
++import { loadVerificationProgress } from "../lib/verificationProgress";
++jest.mock("../lib/session", () => ({
++  useSession: () => ({
++    status: "ready",
++    userId: "fixture-user",
++    emailVerified: true,
++  }),
++}));
++jest.mock("../lib/idVerification", () => ({
++  listSchools: async () => [{ id: "fixture-school", name: "Fixture School" }],
++  ROLES: ["student"],
++  submitId: jest.fn(),
++}));
++jest.mock("../lib/verificationProgress", () => ({
++  ...jest.requireActual("../lib/verificationProgress"),
++  loadVerificationProgress: jest.fn(),
++}));
++jest.mock("../lib/supabase", () => ({ supabase: {} }));
++jest.mock("expo-image-picker", () => ({}));
++jest.mock("react-native-safe-area-context", () => ({
++  SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
++}));
++jest.mock("expo-router", () => {
++  const { Text } = jest.requireActual("react-native");
++  return {
++    Link: ({ children }: { children: React.ReactNode }) => (
++      <Text>{children}</Text>
++    ),
++  };
++});
++const load = loadVerificationProgress as jest.Mock;
++it("restores queued review after reopening and hides duplicate submission controls", async () => {
++  load.mockResolvedValue({
++    emailVerified: true,
++    schoolVerified: false,
++    reviewStatus: "queued",
++  });
++  await render(<VerifyIdScreen />);
++  await waitFor(() =>
++    expect(
++      screen.queryByRole("button", { name: "Submit for review" }),
++    ).toBeNull(),
++  );
++  expect(
++    screen.getAllByText(/Submission is not approval/).length,
++  ).toBeGreaterThan(0);
++});
++it("offers replacement evidence when a reviewer requested a new image", async () => {
++  load.mockResolvedValue({
++    emailVerified: true,
++    schoolVerified: false,
++    reviewStatus: "needs_reupload",
++  });
++  await render(<VerifyIdScreen />);
++  await waitFor(() =>
++    expect(screen.getByText(/requested a new image/)).toBeTruthy(),
++  );
++  expect(
++    screen.getByRole("button", { name: "Submit for review" }),
++  ).toBeTruthy();
++});
+diff --git a/src/__tests__/id-submission.test.ts b/src/__tests__/id-submission.test.ts
+new file mode 100644
+index 0000000..1a3e9f0
+--- /dev/null
++++ b/src/__tests__/id-submission.test.ts
+@@ -0,0 +1,58 @@
++import { submitId } from "../lib/idVerification";
++const mockRpc = jest.fn();
++const mockUpload = jest.fn();
++const mockInvoke = jest.fn();
++jest.mock("../lib/supabase", () => ({
++  supabase: {
++    rpc: (...args: unknown[]) => mockRpc(...args),
++    storage: {
++      from: () => ({ upload: (...args: unknown[]) => mockUpload(...args) }),
++    },
++    functions: { invoke: (...args: unknown[]) => mockInvoke(...args) },
++  },
++}));
++beforeEach(() => {
++  jest.resetAllMocks();
++  mockRpc
++    .mockResolvedValueOnce({ data: "fixture-request", error: null })
++    .mockResolvedValueOnce({ error: null });
++  mockUpload.mockResolvedValue({ error: null });
++  jest
++    .spyOn(global, "fetch")
++    .mockResolvedValue({
++      blob: async () => new Blob(["synthetic fixture, not an ID"]),
++    } as Response);
++});
++afterEach(() => jest.restoreAllMocks());
++const input = {
++  userId: "fixture-user",
++  role: "student" as const,
++  schoolId: "fixture-school",
++  schoolEmail: "a@example.test",
++  image: { uri: "fixture://id", mimeType: "image/png" },
++};
++it.each([false, true])(
++  "retains a queued upload when the auxiliary check fails, thrown=%s",
++  async (throws) => {
++    if (throws) mockInvoke.mockRejectedValue(new Error("network unavailable"));
++    else
++      mockInvoke.mockResolvedValue({
++        error: new Error("function unavailable"),
++      });
++    await expect(submitId(input)).resolves.toEqual({
++      requestId: "fixture-request",
++      checkInvocationFailed: true,
++    });
++    expect(mockRpc.mock.calls.map((call) => call[0])).toEqual([
++      "start_school_verification",
++      "record_id_upload",
++    ]);
++    expect(mockUpload).toHaveBeenCalledTimes(1);
++  },
++);
++it("does not claim the upload is saved when storage fails", async () => {
++  mockUpload.mockResolvedValue({ error: new Error("Upload denied") });
++  await expect(submitId(input)).rejects.toThrow("Upload denied");
++  expect(mockInvoke).not.toHaveBeenCalled();
++  expect(mockRpc).toHaveBeenCalledTimes(1);
++});
+diff --git a/src/__tests__/progress-screen.test.tsx b/src/__tests__/progress-screen.test.tsx
+new file mode 100644
+index 0000000..1047a18
+--- /dev/null
++++ b/src/__tests__/progress-screen.test.tsx
+@@ -0,0 +1,97 @@
++import {
++  fireEvent,
++  render,
++  screen,
++  waitFor,
++} from "@testing-library/react-native";
++import { VerificationProgress } from "../components/VerificationProgress";
++import { loadVerificationProgress } from "../lib/verificationProgress";
++const mockSession = jest.fn();
++jest.mock("../lib/session", () => ({ useSession: () => mockSession() }));
++jest.mock("../lib/verificationProgress", () => ({
++  ...jest.requireActual("../lib/verificationProgress"),
++  loadVerificationProgress: jest.fn(),
++}));
++jest.mock("../lib/supabase", () => ({ supabase: {} }));
++jest.mock("expo-router", () => {
++  const { Text } = jest.requireActual("react-native");
++  return {
++    Link: ({ children }: { children: React.ReactNode }) => (
++      <Text>{children}</Text>
++    ),
++  };
++});
++const load = loadVerificationProgress as jest.Mock;
++beforeEach(() => {
++  jest.resetAllMocks();
++  mockSession.mockReturnValue({ status: "ready", userId: "fixture-user" });
++});
++it("restores pending review after remount and distinguishes reupload and approval on refresh", async () => {
++  load.mockResolvedValueOnce({
++    emailVerified: true,
++    schoolVerified: false,
++    reviewStatus: "manual_review",
++  });
++  await render(<VerificationProgress />);
++  await waitFor(() =>
++    expect(screen.getByText(/Submission is not approval/)).toBeTruthy(),
++  );
++  load.mockResolvedValueOnce({
++    emailVerified: true,
++    schoolVerified: false,
++    reviewStatus: "needs_reupload",
++  });
++  await fireEvent.press(
++    screen.getByRole("button", { name: "Refresh verification progress" }),
++  );
++  await waitFor(() =>
++    expect(screen.getByText(/requested a new image/)).toBeTruthy(),
++  );
++  expect(
++    screen.getByText(
++      "School affiliation review — Complete earlier steps first",
++    ),
++  ).toBeTruthy();
++  load.mockResolvedValueOnce({
++    emailVerified: true,
++    schoolVerified: true,
++    reviewStatus: "approved",
++  });
++  await fireEvent.press(
++    screen.getByRole("button", { name: "Refresh verification progress" }),
++  );
++  await waitFor(() =>
++    expect(
++      screen.getByText("School affiliation review — Completed"),
++    ).toBeTruthy(),
++  );
++});
++it("displays a failed status request and permits retry without inventing approval", async () => {
++  load.mockRejectedValueOnce(new Error("Migration not installed"));
++  await render(<VerificationProgress />);
++  await waitFor(() =>
++    expect(screen.getByRole("alert")).toHaveTextContent(
++      "Migration not installed",
++    ),
++  );
++  expect(
++    screen.queryByText("School affiliation review — Completed"),
++  ).toBeNull();
++  load.mockResolvedValueOnce({
++    emailVerified: true,
++    schoolVerified: false,
++    reviewStatus: null,
++  });
++  await fireEvent.press(
++    screen.getByRole("button", { name: "Refresh verification progress" }),
++  );
++  await waitFor(() =>
++    expect(screen.getByText("Submit school ID — Next step")).toBeTruthy(),
++  );
++});
++it("does not request private progress for signed-out visitors", async () => {
++  mockSession.mockReturnValue({ status: "signedOut" });
++  await render(<VerificationProgress />);
++  expect(load).not.toHaveBeenCalled();
++  expect(screen.getByText("Create account — Next step")).toBeTruthy();
++});
+diff --git a/src/__tests__/registration.test.ts b/src/__tests__/registration.test.ts
+new file mode 100644
+index 0000000..e6f4456
+--- /dev/null
++++ b/src/__tests__/registration.test.ts
+@@ -0,0 +1,35 @@
++import { passwordStrength, signupError } from "../lib/registration";
++
++it("rejects malformed email, mismatched passwords and unsupported lengths", () => {
++  expect(
++    signupError(
++      "not-an-email",
++      "Long enough passphrase",
++      "Long enough passphrase",
++    ),
++  ).toMatch(/email/);
++  expect(signupError("a@example.test", "short", "short")).toMatch(/12/);
++  expect(
++    signupError("a@example.test", "x".repeat(129), "x".repeat(129)),
++  ).toMatch(/128/);
++  expect(
++    signupError(
++      "a@example.test",
++      "Long enough passphrase",
++      "Different passphrase",
++    ),
++  ).toMatch(/match/);
++  expect(
++    signupError(
++      " a@example.test ",
++      "Long enough passphrase!",
++      "Long enough passphrase!",
++    ),
++  ).toBeNull();
++});
++it("gives length and variety guidance without claiming a security guarantee", () => {
++  expect(passwordStrength("")).toMatch(/12/);
++  expect(passwordStrength("short")).toBe("Too short");
++  expect(passwordStrength("abcdefghijkl")).toMatch(/Good length/);
++  expect(passwordStrength("Long and varied passphrase 12!")).toMatch(/Strong/);
++});
+diff --git a/src/__tests__/route-guards.test.tsx b/src/__tests__/route-guards.test.tsx
+new file mode 100644
+index 0000000..86f1e7a
+--- /dev/null
++++ b/src/__tests__/route-guards.test.tsx
+@@ -0,0 +1,38 @@
++import { render, screen } from "@testing-library/react-native";
++import RootLayout from "../app/_layout";
++const mockSession = jest.fn();
++jest.mock("../lib/session", () => ({
++  useSession: () => mockSession(),
++  SessionProvider: ({ children }: { children: React.ReactNode }) => children,
++}));
++jest.mock("expo-router", () => {
++  const { Text } = jest.requireActual("react-native");
++  const Stack = ({ children }: { children: React.ReactNode }) => children;
++  Stack.Protected = function Protected({
++    guard,
++    children,
++  }: {
++    guard: boolean;
++    children: React.ReactNode;
++  }) {
++    return guard ? children : null;
++  };
++  Stack.Screen = function Screen({ name }: { name: string }) {
++    return <Text>{name}</Text>;
++  };
++  return { Stack };
++});
++it.each([
++  [{ status: "signedOut" }, true, false],
++  [{ status: "ready", userId: "u1", emailVerified: false }, true, false],
++  [{ status: "ready", userId: "u1", emailVerified: true }, false, true],
++])(
++  "shows email confirmation and protects ID routes for session %j",
++  async (session, confirmation, verification) => {
++    mockSession.mockReturnValue(session);
++    await render(<RootLayout />);
++    expect(Boolean(screen.queryByText("verify-email"))).toBe(confirmation);
++    expect(Boolean(screen.queryByText("verify-id"))).toBe(verification);
++    expect(Boolean(screen.queryByText("admin-review"))).toBe(verification);
++  },
++);
+diff --git a/src/__tests__/session.test.tsx b/src/__tests__/session.test.tsx
+new file mode 100644
+index 0000000..cb7ce88
+--- /dev/null
++++ b/src/__tests__/session.test.tsx
+@@ -0,0 +1,90 @@
++import { act, render, screen, waitFor } from "@testing-library/react-native";
++import { Text } from "react-native";
++import { SessionProvider, useSession } from "../lib/session";
++const mockGetSession = jest.fn();
++const mockOnAuth = jest.fn();
++jest.mock("../lib/supabase", () => ({
++  isSupabaseConfigured: true,
++  supabase: {
++    auth: {
++      getSession: (...args: unknown[]) => mockGetSession(...args),
++      onAuthStateChange: (...args: unknown[]) => mockOnAuth(...args),
++    },
++  },
++}));
++function Probe() {
++  const state = useSession();
++  return <Text>{JSON.stringify(state)}</Text>;
++}
++let authChanged: (event: string, session: unknown) => void;
++beforeEach(() => {
++  jest.resetAllMocks();
++  mockOnAuth.mockImplementation((callback) => {
++    authChanged = callback;
++    return { data: { subscription: { unsubscribe: jest.fn() } } };
++  });
++});
++it.each([undefined, "2026-10-18T00:00:00Z"])(
++  "derives email verification from the Supabase user, confirmed at %s",
++  async (confirmed) => {
++    mockGetSession.mockResolvedValue({
++      data: {
++        session: {
++          user: {
++            id: "u1",
++            email: "a@example.test",
++            email_confirmed_at: confirmed,
++          },
++        },
++      },
++      error: null,
++    });
++    await render(
++      <SessionProvider>
++        <Probe />
++      </SessionProvider>,
++    );
++    await waitFor(() =>
++      expect(screen.getByText(/"status":"ready"/)).toBeTruthy(),
++    );
++    expect(
++      screen.getByText(new RegExp(`"emailVerified":${Boolean(confirmed)}`)),
++    ).toBeTruthy();
++  },
++);
++it("reports session restore errors instead of assuming a usable session", async () => {
++  mockGetSession.mockResolvedValue({
++    data: { session: null },
++    error: new Error("Session service unavailable"),
++  });
++  await render(
++    <SessionProvider>
++      <Probe />
++    </SessionProvider>,
++  );
++  await waitFor(() =>
++    expect(screen.getByText(/Session service unavailable/)).toBeTruthy(),
++  );
++});
++it("does not overwrite a fresh auth event with an older session-restore response", async () => {
++  let restore!: (value: unknown) => void;
++  mockGetSession.mockReturnValue(
++    new Promise((resolve) => {
++      restore = resolve;
++    }),
++  );
++  await render(
++    <SessionProvider>
++      <Probe />
++    </SessionProvider>,
++  );
++  await act(async () => {
++    authChanged("SIGNED_IN", {
++      user: { id: "fresh", email_confirmed_at: "2026-10-18" },
++    });
++  });
++  await act(async () => {
++    restore({ data: { session: null }, error: null });
++  });
++  expect(screen.getByText(/"userId":"fresh"/)).toBeTruthy();
++});
+diff --git a/src/__tests__/verificationProgress.test.ts b/src/__tests__/verificationProgress.test.ts
+new file mode 100644
+index 0000000..b9d15b9
+--- /dev/null
++++ b/src/__tests__/verificationProgress.test.ts
+@@ -0,0 +1,99 @@
++import {
++  loadVerificationProgress,
++  progressSteps,
++  type VerificationProgress,
++} from "../lib/verificationProgress";
++const mockRpc = jest.fn();
++jest.mock("../lib/supabase", () => ({
++  supabase: { rpc: (...args: unknown[]) => mockRpc(...args) },
++}));
++beforeEach(() => jest.resetAllMocks());
++it("locks all verification steps for visitors and does not trust inconsistent approval flags", () => {
++  expect(progressSteps(null, false).map((s) => s.state)).toEqual([
++    "current",
++    "locked",
++    "locked",
++    "locked",
++  ]);
++  expect(
++    progressSteps(
++      { emailVerified: false, schoolVerified: true, reviewStatus: "approved" },
++      true,
++    ).map((s) => s.state),
++  ).toEqual(["complete", "current", "locked", "locked"]);
++});
++it.each(["queued", "processing", "manual_review"] as const)(
++  "%s means review pending, never affiliation approved",
++  (reviewStatus) => {
++    const p = { emailVerified: true, schoolVerified: false, reviewStatus };
++    expect(progressSteps(p, true).map((s) => s.state)).toEqual([
++      "complete",
++      "complete",
++      "complete",
++      "current",
++    ]);
++  },
++);
++it.each(["rejected", "needs_reupload", "awaiting_upload"] as const)(
++  "%s resumes evidence collection",
++  (reviewStatus) => {
++    expect(
++      progressSteps(
++        { emailVerified: true, schoolVerified: false, reviewStatus },
++        true,
++      ).map((s) => s.state),
++    ).toEqual(["complete", "complete", "current", "locked"]);
++  },
++);
++it("requires both an approved request and saved affiliation for complete status", () => {
++  const p: VerificationProgress = {
++    emailVerified: true,
++    schoolVerified: false,
++    reviewStatus: "approved",
++  };
++  expect(progressSteps(p, true)[3].state).toBe("current");
++  expect(
++    progressSteps({ ...p, schoolVerified: true }, true).every(
++      (s) => s.state === "complete",
++    ),
++  ).toBe(true);
++});
++it("uses an owner-selected database RPC without accepting a client-supplied user ID", async () => {
++  mockRpc.mockResolvedValue({
++    data: {
++      email_verified: true,
++      school_verified: false,
++      review_status: "manual_review",
++    },
++    error: null,
++  });
++  await expect(loadVerificationProgress()).resolves.toEqual({
++    emailVerified: true,
++    schoolVerified: false,
++    reviewStatus: "manual_review",
++  });
++  expect(mockRpc).toHaveBeenCalledWith("my_verification_progress");
++});
++it("fails closed on missing migration, unknown states and forged boolean strings", async () => {
++  mockRpc.mockResolvedValueOnce({
++    data: null,
++    error: new Error("function missing"),
++  });
++  await expect(loadVerificationProgress()).rejects.toThrow("function missing");
++  for (const data of [
++    null,
++    {
++      email_verified: "true",
++      school_verified: true,
++      review_status: "approved",
++    },
++    {
++      email_verified: true,
++      school_verified: true,
++      review_status: "fake_approval",
++    },
++  ]) {
++    mockRpc.mockResolvedValueOnce({ data, error: null });
++    await expect(loadVerificationProgress()).rejects.toThrow(/validated/);
++  }
++});
+diff --git a/src/app/_layout.tsx b/src/app/_layout.tsx
+index 7079e57..9ff2c21 100644
+--- a/src/app/_layout.tsx
++++ b/src/app/_layout.tsx
+@@ -15,19 +15,34 @@ function Routes() {
+   const session = useSession();
+   if (session.status === "loading" || session.status === "error") {
+     return (
+-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24 }}>
+-        {session.status === "loading" ? <ActivityIndicator /> : <Text>{session.message}</Text>}
++      <View
++        style={{
++          flex: 1,
++          alignItems: "center",
++          justifyContent: "center",
++          padding: 24,
++        }}
++      >
++        {session.status === "loading" ? (
++          <ActivityIndicator />
++        ) : (
++          <Text>{session.message}</Text>
++        )}
+       </View>
+     );
+   }
+   const signedIn = session.status === "ready";
++  const confirmed = session.status === "ready" && session.emailVerified;
+   return (
+     <Stack screenOptions={{ headerShown: false }}>
+       <Stack.Protected guard={!signedIn}>
+         <Stack.Screen name="signup" />
+         <Stack.Screen name="login" />
+       </Stack.Protected>
+-      <Stack.Protected guard={signedIn}>
++      <Stack.Protected guard={!confirmed}>
++        <Stack.Screen name="verify-email" />
++      </Stack.Protected>
++      <Stack.Protected guard={confirmed}>
+         <Stack.Screen name="location" />
+         <Stack.Screen name="verify-id" />
+         <Stack.Screen name="admin-review" />
+diff --git a/src/app/index.tsx b/src/app/index.tsx
+index 3727805..7b4421a 100644
+--- a/src/app/index.tsx
++++ b/src/app/index.tsx
+@@ -1,3 +1,4 @@
++import { VerificationProgress } from "../components/VerificationProgress";
+ import { Link, type Href } from "expo-router";
+ import { StyleSheet, Text, View } from "react-native";
+ import { SafeAreaView } from "react-native-safe-area-context";
+@@ -20,7 +21,8 @@ export default function Index() {
+     <SafeAreaView style={styles.screen}>
+       <View style={styles.body}>
+         <Text style={styles.title}>BrainCraze</Text>
+-        {SIGNED_IN.map((page) => (
++        <VerificationProgress />
++        {(session.emailVerified ? SIGNED_IN : []).map((page) => (
+           <Link key={page.label} href={page.href} style={styles.button}>
+             <Text style={styles.buttonText}>{page.label}</Text>
+           </Link>
+@@ -34,6 +36,12 @@ const styles = StyleSheet.create({
+   screen: { flex: 1 },
+   body: { flex: 1, justifyContent: "center", padding: 24, gap: 12 },
+   title: { fontSize: 28, fontWeight: "700", marginBottom: 12 },
+-  button: { padding: 16, borderRadius: 10, backgroundColor: "#222", overflow: "hidden", textAlign: "center" },
++  button: {
++    padding: 16,
++    borderRadius: 10,
++    backgroundColor: "#222",
++    overflow: "hidden",
++    textAlign: "center",
++  },
+   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+ });
+diff --git a/src/app/verify-email.tsx b/src/app/verify-email.tsx
+new file mode 100644
+index 0000000..045a13a
+--- /dev/null
++++ b/src/app/verify-email.tsx
+@@ -0,0 +1,115 @@
++import { useEffect, useRef, useState } from "react";
++import {
++  Pressable,
++  ScrollView,
++  StyleSheet,
++  Text,
++  TextInput,
++} from "react-native";
++import { Link } from "expo-router";
++import { SafeAreaView } from "react-native-safe-area-context";
++import { resendConfirmation } from "../lib/auth";
++import { useSession } from "../lib/session";
++import { errorText } from "../lib/errors";
++
++export default function VerifyEmailScreen() {
++  const session = useSession();
++  const [email, setEmail] = useState(
++    session.status === "ready" ? (session.email ?? "") : "",
++  );
++  const [busy, setBusy] = useState(false);
++  const submitting = useRef(false);
++  const [cooldown, setCooldown] = useState(0);
++  const [message, setMessage] = useState<string | null>(null);
++  const [error, setError] = useState<string | null>(null);
++  useEffect(() => {
++    if (!cooldown) return;
++    const timer = setTimeout(() => setCooldown((n) => n - 1), 1000);
++    return () => clearTimeout(timer);
++  }, [cooldown]);
++  async function resend() {
++    if (submitting.current || cooldown) return;
++    setError(null);
++    setMessage(null);
++    if (
++      email.trim().length > 254 ||
++      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
++    ) {
++      setError("Enter a valid email address.");
++      return;
++    }
++    submitting.current = true;
++    setBusy(true);
++    try {
++      await resendConfirmation(email);
++      setMessage(
++        "If this address can be confirmed, a new confirmation email has been requested. Check your inbox, then log in.",
++      );
++      setCooldown(60);
++    } catch (e) {
++      setError(errorText(e));
++    } finally {
++      submitting.current = false;
++      setBusy(false);
++    }
++  }
++  return (
++    <SafeAreaView style={styles.safe}>
++      <ScrollView
++        contentContainerStyle={styles.content}
++        keyboardShouldPersistTaps="handled"
++      >
++        <Text accessibilityRole="header" style={styles.title}>
++          Verify your email
++        </Text>
++        <Text>
++          Open the BrainCraze confirmation email and follow its link. Then
++          return here and log in. This screen cannot approve an email address or
++          an ID.
++        </Text>
++        <TextInput
++          accessibilityLabel="Email"
++          placeholder="Email"
++          autoComplete="email"
++          autoCapitalize="none"
++          keyboardType="email-address"
++          maxLength={254}
++          value={email}
++          onChangeText={setEmail}
++          editable={!busy}
++          style={styles.input}
++        />
++        <Pressable
++          accessibilityRole="button"
++          accessibilityLabel="Resend confirmation email"
++          disabled={busy || Boolean(cooldown)}
++          onPress={resend}
++        >
++          <Text>
++            {busy
++              ? "Requesting email…"
++              : cooldown
++                ? `Resend available in ${cooldown}s`
++                : "Resend confirmation email"}
++          </Text>
++        </Pressable>
++        {error && <Text accessibilityRole="alert">{error}</Text>}
++        {message && <Text accessibilityLiveRegion="polite">{message}</Text>}
++        <Link href="/login">Log in after confirming</Link>
++        <Link href="/">Back to BrainCraze</Link>
++      </ScrollView>
++    </SafeAreaView>
++  );
++}
++const styles = StyleSheet.create({
++  safe: { flex: 1 },
++  content: {
++    padding: 24,
++    gap: 16,
++    maxWidth: 480,
++    width: "100%",
++    alignSelf: "center",
++  },
++  title: { fontSize: 24, fontWeight: "700" },
++  input: { padding: 12, borderWidth: 1, borderColor: "#777", borderRadius: 8 },
++});
+diff --git a/src/app/verify-id.tsx b/src/app/verify-id.tsx
+index d872103..5aed7b2 100644
+--- a/src/app/verify-id.tsx
++++ b/src/app/verify-id.tsx
+@@ -1,10 +1,28 @@
++import type { VerificationProgress as SavedProgress } from "../lib/verificationProgress";
++import { VerificationProgress } from "../components/VerificationProgress";
++import { onboardingCopy } from "../content/onboarding";
+ import { useEffect, useState } from "react";
+-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
++import {
++  ActivityIndicator,
++  Image,
++  Pressable,
++  ScrollView,
++  StyleSheet,
++  Text,
++  TextInput,
++  View,
++} from "react-native";
+ import * as ImagePicker from "expo-image-picker";
+ import { SafeAreaView } from "react-native-safe-area-context";
+ import { FeatureGate } from "../components/FeatureGate";
+ import { errorText } from "../lib/errors";
+-import { listSchools, ROLES, submitId, type Role, type School } from "../lib/idVerification";
++import {
++  listSchools,
++  ROLES,
++  submitId,
++  type Role,
++  type School,
++} from "../lib/idVerification";
+ import { useSession } from "../lib/session";
+ 
+ export default function VerifyIdScreen() {
+@@ -17,6 +35,14 @@ export default function VerifyIdScreen() {
+   const [busy, setBusy] = useState(false);
+   const [message, setMessage] = useState<string | null>(null);
+   const [done, setDone] = useState(false);
++  const [savedProgress, setSavedProgress] = useState<SavedProgress | null>(
++    null,
++  );
++  const pending = ["queued", "processing", "manual_review"].includes(
++    savedProgress?.reviewStatus ?? "",
++  );
++  const approved =
++    savedProgress?.schoolVerified && savedProgress.reviewStatus === "approved";
+ 
+   useEffect(() => {
+     listSchools()
+@@ -33,7 +59,10 @@ export default function VerifyIdScreen() {
+       setMessage("Permission was not granted.");
+       return;
+     }
+-    const options: ImagePicker.ImagePickerOptions = { mediaTypes: ["images"], quality: 0.8 };
++    const options: ImagePicker.ImagePickerOptions = {
++      mediaTypes: ["images"],
++      quality: 0.8,
++    };
+     const result = camera
+       ? await ImagePicker.launchCameraAsync(options)
+       : await ImagePicker.launchImageLibraryAsync(options);
+@@ -45,7 +74,17 @@ export default function VerifyIdScreen() {
+     setBusy(true);
+     setMessage(null);
+     try {
+-      await submitId({ userId: session.userId, role, schoolId, schoolEmail: email, image });
++      const result = await submitId({
++        userId: session.userId,
++        role,
++        schoolId,
++        schoolEmail: email,
++        image,
++      });
++      if (result.checkInvocationFailed)
++        setMessage(
++          "Your upload was saved for review, but the automated-check request failed. An administrator must review your ID; do not upload a duplicate.",
++        );
+       setDone(true);
+     } catch (e) {
+       setMessage(errorText(e));
+@@ -57,66 +96,109 @@ export default function VerifyIdScreen() {
+   return (
+     <SafeAreaView style={styles.safe}>
+       <FeatureGate feature="verify-id">
+-      <ScrollView contentContainerStyle={styles.content}>
+-        <Text style={styles.title} accessibilityRole="header">
+-          Verify your school ID
+-        </Text>
+-        {done ? (
+-          <Text style={styles.body}>
+-            Thanks! Your ID is under review. Once a person has looked at it, your photo is deleted.
++        <ScrollView contentContainerStyle={styles.content}>
++          <Text style={styles.title} accessibilityRole="header">
++            Verify your school ID
+           </Text>
+-        ) : (
+-          <>
++          <VerificationProgress
++            revision={done ? 1 : 0}
++            onProgress={setSavedProgress}
++          />
++          {done || pending || approved ? (
+             <Text style={styles.body}>
+-              Upload a clear photo of your whole school ID. A person reviews every submission, and the photo is
+-              deleted after they decide.
++              {approved
++                ? "Your school affiliation has been approved."
++                : onboardingCopy.pending}{" "}
++              {onboardingCopy.privacy}
+             </Text>
+-            <Text style={styles.label}>School</Text>
+-            <View style={styles.row}>
+-              {schools.map((s) => (
+-                <Chip key={s.id} label={s.name} selected={schoolId === s.id} onPress={() => setSchoolId(s.id)} />
+-              ))}
+-            </View>
+-            <Text style={styles.label}>I am a</Text>
+-            <View style={styles.row}>
+-              {ROLES.map((r) => (
+-                <Chip key={r} label={r.replace("_", " ")} selected={role === r} onPress={() => setRole(r)} />
+-              ))}
+-            </View>
+-            <Text style={styles.label}>School email</Text>
+-            <TextInput
+-              style={styles.input}
+-              value={email}
+-              onChangeText={setEmail}
+-              autoCapitalize="none"
+-              keyboardType="email-address"
+-              accessibilityLabel="School email"
+-            />
+-            <View style={styles.row}>
+-              <Chip label="Take photo" selected={false} onPress={() => pick(true)} />
+-              <Chip label="Choose photo" selected={false} onPress={() => pick(false)} />
+-            </View>
+-            {image && <Image source={{ uri: image.uri }} style={styles.preview} accessibilityLabel="ID preview" />}
+-            <Pressable
+-              accessibilityRole="button"
+-              accessibilityLabel="Submit for review"
+-              disabled={busy || !schoolId || !image || !email}
+-              onPress={submit}
+-              style={[styles.button, (busy || !schoolId || !image || !email) && styles.disabled]}
+-            >
+-              <Text style={styles.buttonText}>Submit for review</Text>
+-            </Pressable>
+-            {busy && <ActivityIndicator accessibilityLabel="Working" />}
+-          </>
+-        )}
+-        {message && <Text style={styles.message}>{message}</Text>}
+-      </ScrollView>
++          ) : (
++            <>
++              <Text style={styles.body}>
++                Upload a clear photo of your whole school ID. A person reviews
++                every submission, and the photo is deleted after their decision
++                when storage cleanup succeeds.
++              </Text>
++              <Text style={styles.label}>School</Text>
++              <View style={styles.row}>
++                {schools.map((s) => (
++                  <Chip
++                    key={s.id}
++                    label={s.name}
++                    selected={schoolId === s.id}
++                    onPress={() => setSchoolId(s.id)}
++                  />
++                ))}
++              </View>
++              <Text style={styles.label}>I am a</Text>
++              <View style={styles.row}>
++                {ROLES.map((r) => (
++                  <Chip
++                    key={r}
++                    label={r.replace("_", " ")}
++                    selected={role === r}
++                    onPress={() => setRole(r)}
++                  />
++                ))}
++              </View>
++              <Text style={styles.label}>School email</Text>
++              <TextInput
++                style={styles.input}
++                value={email}
++                onChangeText={setEmail}
++                autoCapitalize="none"
++                keyboardType="email-address"
++                accessibilityLabel="School email"
++              />
++              <View style={styles.row}>
++                <Chip
++                  label="Take photo"
++                  selected={false}
++                  onPress={() => pick(true)}
++                />
++                <Chip
++                  label="Choose photo"
++                  selected={false}
++                  onPress={() => pick(false)}
++                />
++              </View>
++              {image && (
++                <Image
++                  source={{ uri: image.uri }}
++                  style={styles.preview}
++                  accessibilityLabel="ID preview"
++                />
++              )}
++              <Pressable
++                accessibilityRole="button"
++                accessibilityLabel="Submit for review"
++                disabled={busy || !schoolId || !image || !email}
++                onPress={submit}
++                style={[
++                  styles.button,
++                  (busy || !schoolId || !image || !email) && styles.disabled,
++                ]}
++              >
++                <Text style={styles.buttonText}>Submit for review</Text>
++              </Pressable>
++              {busy && <ActivityIndicator accessibilityLabel="Working" />}
++            </>
++          )}
++          {message && <Text style={styles.message}>{message}</Text>}
++        </ScrollView>
+       </FeatureGate>
+     </SafeAreaView>
+   );
+ }
+ 
+-function Chip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
++function Chip({
++  label,
++  selected,
++  onPress,
++}: {
++  label: string;
++  selected: boolean;
++  onPress: () => void;
++}) {
+   return (
+     <Pressable
+       accessibilityRole="button"
+@@ -124,25 +206,51 @@ function Chip({ label, selected, onPress }: { label: string; selected: boolean;
+       onPress={onPress}
+       style={[styles.chip, selected && styles.chipSelected]}
+     >
+-      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
++      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
++        {label}
++      </Text>
+     </Pressable>
+   );
+ }
+ 
+ const styles = StyleSheet.create({
+   safe: { flex: 1, backgroundColor: "#FFF8F0" },
+-  content: { padding: 20, gap: 12, maxWidth: 560, width: "100%", alignSelf: "center" },
++  content: {
++    padding: 20,
++    gap: 12,
++    maxWidth: 560,
++    width: "100%",
++    alignSelf: "center",
++  },
+   title: { fontSize: 26, fontWeight: "700", color: "#3B2F5C" },
+   body: { fontSize: 16, lineHeight: 22, color: "#4A4458" },
+   label: { fontSize: 14, fontWeight: "600", color: "#3B2F5C" },
+   row: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+-  input: { backgroundColor: "#FFFFFF", borderRadius: 12, paddingHorizontal: 14, minHeight: 48, fontSize: 16 },
+-  chip: { minHeight: 44, borderRadius: 14, backgroundColor: "#E3D9FF", justifyContent: "center", paddingHorizontal: 14 },
++  input: {
++    backgroundColor: "#FFFFFF",
++    borderRadius: 12,
++    paddingHorizontal: 14,
++    minHeight: 48,
++    fontSize: 16,
++  },
++  chip: {
++    minHeight: 44,
++    borderRadius: 14,
++    backgroundColor: "#E3D9FF",
++    justifyContent: "center",
++    paddingHorizontal: 14,
++  },
+   chipSelected: { backgroundColor: "#6B4FBB" },
+   chipText: { color: "#3B2F5C", fontSize: 15, fontWeight: "600" },
+   chipTextSelected: { color: "#FFFFFF" },
+   preview: { width: "100%", aspectRatio: 1.6, borderRadius: 12 },
+-  button: { minHeight: 48, borderRadius: 16, backgroundColor: "#6B4FBB", alignItems: "center", justifyContent: "center" },
++  button: {
++    minHeight: 48,
++    borderRadius: 16,
++    backgroundColor: "#6B4FBB",
++    alignItems: "center",
++    justifyContent: "center",
++  },
+   buttonText: { color: "#FFFFFF", fontSize: 16, fontWeight: "600" },
+   disabled: { opacity: 0.5 },
+   message: { fontSize: 15, color: "#8A3B12" },
+diff --git a/src/components/AuthForm.tsx b/src/components/AuthForm.tsx
+index 3e05208..8d538b9 100644
+--- a/src/components/AuthForm.tsx
++++ b/src/components/AuthForm.tsx
+@@ -1,80 +1,186 @@
+-import { useState } from "react";
+-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
++import { useRef, useState } from "react";
++import {
++  ActivityIndicator,
++  Pressable,
++  ScrollView,
++  StyleSheet,
++  Text,
++  TextInput,
++} from "react-native";
+ import { Link } from "expo-router";
+ import { SafeAreaView } from "react-native-safe-area-context";
+ import { logIn, signUp } from "../lib/auth";
+ import { errorText } from "../lib/errors";
++import { passwordStrength, signupError } from "../lib/registration";
++import { VerificationProgress } from "./VerificationProgress";
+ 
+-// Shared by the sign up and log in pages. Both use email and password only.
+ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
+   const isSignup = mode === "signup";
+   const [email, setEmail] = useState("");
+   const [password, setPassword] = useState("");
++  const [confirmation, setConfirmation] = useState("");
++  const [showPassword, setShowPassword] = useState(false);
+   const [busy, setBusy] = useState(false);
++  const submitting = useRef(false);
+   const [message, setMessage] = useState<string | null>(null);
++  const [error, setError] = useState<string | null>(null);
+ 
+   async function submit() {
+-    setBusy(true);
++    if (submitting.current) return;
++    setError(null);
+     setMessage(null);
++    const invalid = isSignup
++      ? signupError(email, password, confirmation)
++      : !email.trim() || !password
++        ? "Enter your email and password."
++        : null;
++    if (invalid) {
++      setError(invalid);
++      return;
++    }
++    submitting.current = true;
++    setBusy(true);
+     try {
+       if (isSignup) {
+         await signUp(email.trim(), password);
+-        setMessage("Check your email and tap the confirmation link to finish signing up. Then log in.");
++        setPassword("");
++        setConfirmation("");
++        setMessage(
++          "Check your email and tap the confirmation link. Then log in to resume verification. Creating an account does not approve your school affiliation.",
++        );
+       } else {
+         await logIn(email.trim(), password);
+       }
+     } catch (e) {
+-      setMessage(errorText(e));
++      setError(errorText(e));
+     } finally {
++      submitting.current = false;
+       setBusy(false);
+     }
+   }
+ 
+   return (
+     <SafeAreaView style={styles.safe}>
+-      <View style={styles.content}>
++      <ScrollView
++        keyboardShouldPersistTaps="handled"
++        contentContainerStyle={styles.content}
++      >
+         <Link href="/" style={styles.link}>
+           Back
+         </Link>
+         <Text style={styles.title} accessibilityRole="header">
+           {isSignup ? "Create your account" : "Log in"}
+         </Text>
++        {isSignup && <VerificationProgress />}
++        <Text>Email</Text>
+         <TextInput
+           style={styles.input}
++          accessibilityLabel="Email"
+           placeholder="Email"
+           autoCapitalize="none"
+           autoComplete="email"
+           keyboardType="email-address"
++          maxLength={254}
++          editable={!busy}
+           value={email}
+           onChangeText={setEmail}
+         />
++        <Text>Password</Text>
+         <TextInput
+           style={styles.input}
++          accessibilityLabel="Password"
+           placeholder="Password"
+-          secureTextEntry
++          secureTextEntry={!showPassword}
+           autoCapitalize="none"
+           autoComplete={isSignup ? "new-password" : "current-password"}
++          editable={!busy}
++          maxLength={128}
+           value={password}
+           onChangeText={setPassword}
+         />
+-        <Pressable style={styles.button} onPress={submit} disabled={busy || !email || !password}>
+-          {busy ? <ActivityIndicator /> : <Text style={styles.buttonText}>{isSignup ? "Sign up" : "Log in"}</Text>}
++        {isSignup && (
++          <>
++            <Text accessibilityLiveRegion="polite">
++              {passwordStrength(password)}
++            </Text>
++            <Text>Confirm password</Text>
++            <TextInput
++              style={styles.input}
++              accessibilityLabel="Confirm password"
++              placeholder="Confirm password"
++              secureTextEntry={!showPassword}
++              autoCapitalize="none"
++              autoComplete="new-password"
++              editable={!busy}
++              maxLength={128}
++              value={confirmation}
++              onChangeText={setConfirmation}
++            />
++          </>
++        )}
++        <Pressable
++          accessibilityRole="button"
++          accessibilityLabel={showPassword ? "Hide password" : "Show password"}
++          onPress={() => setShowPassword(!showPassword)}
++        >
++          <Text>{showPassword ? "Hide password" : "Show password"}</Text>
+         </Pressable>
+-        {message && <Text>{message}</Text>}
++        <Pressable
++          accessibilityRole="button"
++          accessibilityLabel={isSignup ? "Sign up" : "Log in"}
++          style={styles.button}
++          onPress={submit}
++          disabled={busy || !email || !password || (isSignup && !confirmation)}
++          accessibilityState={{
++            disabled:
++              busy || !email || !password || (isSignup && !confirmation),
++          }}
++        >
++          {busy ? (
++            <ActivityIndicator accessibilityLabel="Submitting" />
++          ) : (
++            <Text style={styles.buttonText}>
++              {isSignup ? "Sign up" : "Log in"}
++            </Text>
++          )}
++        </Pressable>
++        {error && <Text accessibilityRole="alert">{error}</Text>}
++        {message && <Text accessibilityLiveRegion="polite">{message}</Text>}
++        <Link href="/verify-email" style={styles.link}>
++          Need another confirmation email?
++        </Link>
+         <Link href={isSignup ? "/login" : "/signup"} style={styles.link}>
+           {isSignup ? "Have an account? Log in" : "New here? Sign up"}
+         </Link>
+-      </View>
++      </ScrollView>
+     </SafeAreaView>
+   );
+ }
+-
+ const styles = StyleSheet.create({
+   safe: { flex: 1 },
+-  content: { flex: 1, justifyContent: "center", padding: 24, gap: 12, width: "100%", maxWidth: 440, alignSelf: "center" },
++  content: {
++    flexGrow: 1,
++    justifyContent: "center",
++    padding: 24,
++    gap: 12,
++    width: "100%",
++    maxWidth: 440,
++    alignSelf: "center",
++  },
+   title: { fontSize: 24, fontWeight: "700" },
+-  input: { borderWidth: 1, borderColor: "#999", borderRadius: 8, padding: 12, fontSize: 16 },
+-  button: { backgroundColor: "#222", borderRadius: 8, padding: 14, alignItems: "center" },
++  input: {
++    borderWidth: 1,
++    borderColor: "#777",
++    borderRadius: 8,
++    padding: 12,
++    fontSize: 16,
++  },
++  button: {
++    backgroundColor: "#222",
++    borderRadius: 8,
++    padding: 14,
++    alignItems: "center",
++  },
+   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+   link: { fontSize: 15, textAlign: "center", textDecorationLine: "underline" },
+ });
+diff --git a/src/components/VerificationProgress.tsx b/src/components/VerificationProgress.tsx
+new file mode 100644
+index 0000000..c0ccf3c
+--- /dev/null
++++ b/src/components/VerificationProgress.tsx
+@@ -0,0 +1,127 @@
++import { useEffect, useState } from "react";
++import {
++  ActivityIndicator,
++  Pressable,
++  StyleSheet,
++  Text,
++  View,
++} from "react-native";
++import { Link } from "expo-router";
++import { useSession } from "../lib/session";
++import {
++  loadVerificationProgress,
++  progressSteps,
++  type VerificationProgress as Progress,
++} from "../lib/verificationProgress";
++import { errorText } from "../lib/errors";
++import { onboardingCopy as copy } from "../content/onboarding";
++
++type Props = {
++  revision?: number;
++  onProgress?: (progress: Progress | null) => void;
++};
++export function VerificationProgress(props: Props) {
++  const session = useSession();
++  const userId = session.status === "ready" ? session.userId : null;
++  return (
++    <ProgressForUser key={userId ?? "visitor"} userId={userId} {...props} />
++  );
++}
++function ProgressForUser({
++  userId,
++  revision = 0,
++  onProgress,
++}: Props & { userId: string | null }) {
++  const [progress, setProgress] = useState<Progress | null>(null);
++  const [busy, setBusy] = useState(Boolean(userId));
++  const [error, setError] = useState<string | null>(null);
++  const [reload, setReload] = useState(0);
++  useEffect(() => {
++    if (!userId) return;
++    let active = true;
++    loadVerificationProgress()
++      .then((saved) => {
++        if (!active) return;
++        setProgress(saved);
++        setError(null);
++        setBusy(false);
++        onProgress?.(saved);
++      })
++      .catch((e) => {
++        if (!active) return;
++        setProgress(null);
++        setError(errorText(e));
++        setBusy(false);
++        onProgress?.(null);
++      });
++    return () => {
++      active = false;
++    };
++  }, [userId, revision, reload, onProgress]);
++  function refresh() {
++    setBusy(true);
++    setProgress(null);
++    setError(null);
++    onProgress?.(null);
++    setReload((n) => n + 1);
++  }
++  const status = progress?.reviewStatus;
++  return (
++    <View style={styles.card}>
++      <Text accessibilityRole="header" style={styles.heading}>
++        {copy.title}
++      </Text>
++      {busy ? (
++        <ActivityIndicator accessibilityLabel="Loading verification progress" />
++      ) : error ? (
++        <Text accessibilityRole="alert">{error}</Text>
++      ) : (
++        progressSteps(progress, Boolean(userId)).map((step) => (
++          <View key={step.key} style={styles.step}>
++            <Text>
++              {copy.steps[step.key]} — {copy.states[step.state]}
++            </Text>
++            {step.state === "current" && step.key !== "review" && (
++              <Link
++                href={
++                  step.key === "account"
++                    ? "/signup"
++                    : step.key === "email"
++                      ? "/verify-email"
++                      : "/verify-id"
++                }
++              >
++                Continue
++              </Link>
++            )}
++          </View>
++        ))
++      )}
++      {userId && (
++        <Pressable accessibilityRole="button" disabled={busy} onPress={refresh}>
++          <Text>Refresh verification progress</Text>
++        </Pressable>
++      )}
++      {progress?.emailVerified &&
++        ["queued", "processing", "manual_review"].includes(status ?? "") && (
++          <Text>{copy.pending}</Text>
++        )}
++      {status === "rejected" && <Text>{copy.rejected}</Text>}
++      {status === "needs_reupload" && <Text>{copy.reupload}</Text>}
++      <Text style={styles.note}>{copy.notice}</Text>
++    </View>
++  );
++}
++const styles = StyleSheet.create({
++  card: {
++    borderColor: "#D9D0E8",
++    borderWidth: 1,
++    borderRadius: 12,
++    padding: 16,
++    gap: 10,
++    width: "100%",
++  },
++  heading: { fontSize: 17, fontWeight: "600" },
++  step: { gap: 4 },
++  note: { fontSize: 13, lineHeight: 19, color: "#4A4458" },
++});
+diff --git a/src/content/onboarding.ts b/src/content/onboarding.ts
+new file mode 100644
+index 0000000..03a8cf5
+--- /dev/null
++++ b/src/content/onboarding.ts
+@@ -0,0 +1,24 @@
++// English source copy for the Expo port. Full multilingual parity is not part of this port.
++export const onboardingCopy = {
++  title: "Signup and verification progress",
++  steps: {
++    account: "Create account",
++    email: "Verify email",
++    submission: "Submit school ID",
++    review: "School affiliation review",
++  },
++  states: {
++    complete: "Completed",
++    current: "Next step",
++    locked: "Complete earlier steps first",
++  },
++  pending: "Your ID is awaiting a human decision. Submission is not approval.",
++  rejected:
++    "Your submission was rejected. Submit replacement evidence to request another review.",
++  reupload:
++    "A reviewer requested a new image. Choose or capture a replacement to continue.",
++  notice:
++    "Email confirmation proves mailbox ownership. It is not a separate CAPTCHA or automated identity check.",
++  privacy:
++    "Images are private. After a review decision, the app attempts to delete the image; failed deletion requires administrator follow-up.",
++} as const;
+diff --git a/src/lib/auth.ts b/src/lib/auth.ts
+index c98b1db..cc79ae4 100644
+--- a/src/lib/auth.ts
++++ b/src/lib/auth.ts
+@@ -5,7 +5,11 @@ const siteUrl = process.env.EXPO_PUBLIC_SITE_URL || "https://braincraze.study";
+ 
+ // Creates an email account. Supabase sends a confirmation email; the account counts as verified once it is confirmed.
+ export async function signUp(email: string, password: string): Promise<void> {
+-  const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: siteUrl } });
++  const { error } = await supabase.auth.signUp({
++    email: email.trim(),
++    password,
++    options: { emailRedirectTo: siteUrl },
++  });
+   if (error) throw error;
+ }
+ 
+@@ -18,3 +22,13 @@ export async function logOut(): Promise<void> {
+   const { error } = await supabase.auth.signOut();
+   if (error) throw error;
+ }
++
++// Supabase enforces confirmation and resend limits; this does not grant verification.
++export async function resendConfirmation(email: string): Promise<void> {
++  const { error } = await supabase.auth.resend({
++    type: "signup",
++    email: email.trim(),
++    options: { emailRedirectTo: siteUrl },
++  });
++  if (error) throw error;
++}
+diff --git a/src/lib/idVerification.ts b/src/lib/idVerification.ts
+index 0d62f3e..2c8e1f6 100644
+--- a/src/lib/idVerification.ts
++++ b/src/lib/idVerification.ts
+@@ -1,8 +1,15 @@
+ import { supabase } from "./supabase";
+ 
+ export type School = { id: string; name: string };
+-export type Role = "student" | "faculty" | "teaching_assistant" | "tutor" | "staff";
+-export const ROLES: Role[] = ["student", "faculty", "teaching_assistant", "tutor", "staff"];
++export type Role =
++  "student" | "faculty" | "teaching_assistant" | "tutor" | "staff";
++export const ROLES: Role[] = [
++  "student",
++  "faculty",
++  "teaching_assistant",
++  "tutor",
++  "staff",
++];
+ 
+ export type QueueItem = {
+   request_id: string;
+@@ -18,7 +25,10 @@ export type QueueItem = {
+ };
+ 
+ export async function listSchools(): Promise<School[]> {
+-  const { data, error } = await supabase.from("schools").select("id, name").order("name");
++  const { data, error } = await supabase
++    .from("schools")
++    .select("id, name")
++    .order("name");
+   if (error) throw error;
+   return data ?? [];
+ }
+@@ -31,28 +41,46 @@ export async function submitId(args: {
+   schoolId: string;
+   schoolEmail: string;
+   image: { uri: string; mimeType?: string | null };
+-}): Promise<string> {
+-  const { data: requestId, error } = await supabase.rpc("start_school_verification", {
+-    p_role: args.role,
+-    p_school_id: args.schoolId,
+-    p_school_email: args.schoolEmail,
+-    p_method: "id_upload",
+-  });
++}): Promise<{ requestId: string; checkInvocationFailed: boolean }> {
++  const { data: requestId, error } = await supabase.rpc(
++    "start_school_verification",
++    {
++      p_role: args.role,
++      p_school_id: args.schoolId,
++      p_school_email: args.schoolEmail,
++      p_method: "id_upload",
++    },
++  );
+   if (error) throw error;
+ 
+-  const contentType = args.image.mimeType === "image/png" ? "image/png" : "image/jpeg";
++  const contentType =
++    args.image.mimeType === "image/png" ? "image/png" : "image/jpeg";
+   const path = `${args.userId}/${requestId}.${contentType === "image/png" ? "png" : "jpg"}`;
+   const blob = await (await fetch(args.image.uri)).blob();
+-  const upload = await supabase.storage.from("id-documents").upload(path, blob, { contentType, upsert: true });
++  const upload = await supabase.storage
++    .from("id-documents")
++    .upload(path, blob, { contentType, upsert: true });
+   if (upload.error) throw upload.error;
+ 
+-  const queued = await supabase.rpc("record_id_upload", { p_request: requestId, p_path: path });
++  const queued = await supabase.rpc("record_id_upload", {
++    p_request: requestId,
++    p_path: path,
++  });
+   if (queued.error) throw queued.error;
+ 
+   // Fire the check. If it fails, the request stays queued and an admin can still review it by hand.
+-  const check = await supabase.functions.invoke("verify-id", { body: { request_id: requestId } });
+-  if (check.error) throw check.error;
+-  return requestId as string;
++  try {
++    const check = await supabase.functions.invoke("verify-id", {
++      body: { request_id: requestId },
++    });
++    return {
++      requestId: requestId as string,
++      checkInvocationFailed: Boolean(check.error),
++    };
++  } catch {
++    // The upload is already queued. Report the check failure without asking for a duplicate upload.
++    return { requestId: requestId as string, checkInvocationFailed: true };
++  }
+ }
+ 
+ export async function fetchQueue(): Promise<QueueItem[]> {
+@@ -62,13 +90,19 @@ export async function fetchQueue(): Promise<QueueItem[]> {
+ }
+ 
+ export async function imageUrl(path: string): Promise<string> {
+-  const { data, error } = await supabase.storage.from("id-documents").createSignedUrl(path, 300);
++  const { data, error } = await supabase.storage
++    .from("id-documents")
++    .createSignedUrl(path, 300);
+   if (error) throw error;
+   return data.signedUrl;
+ }
+ 
+ // Records the human decision, then deletes the uploaded image and clears its path.
+-export async function decide(requestId: string, decision: "approved" | "rejected", note?: string) {
++export async function decide(
++  requestId: string,
++  decision: "approved" | "rejected",
++  note?: string,
++) {
+   const { data: path, error } = await supabase.rpc("admin_decide", {
+     p_request: requestId,
+     p_decision: decision,
+@@ -91,8 +125,12 @@ async function deleteImage(requestId: string, path: string | null) {
+   if (!path) return;
+   const removed = await supabase.storage.from("id-documents").remove([path]);
+   if (removed.error) {
+-    throw new Error(`Decision saved, but the image could not be deleted (${path}): ${removed.error.message}`);
++    throw new Error(
++      `Decision saved, but the image could not be deleted (${path}): ${removed.error.message}`,
++    );
+   }
+-  const { error } = await supabase.rpc("clear_id_path", { p_request: requestId });
++  const { error } = await supabase.rpc("clear_id_path", {
++    p_request: requestId,
++  });
+   if (error) throw error;
+ }
+diff --git a/src/lib/registration.ts b/src/lib/registration.ts
+new file mode 100644
+index 0000000..8b68d20
+--- /dev/null
++++ b/src/lib/registration.ts
+@@ -0,0 +1,25 @@
++export function signupError(
++  email: string,
++  password: string,
++  confirmation: string,
++): string | null {
++  if (
++    email.trim().length > 254 ||
++    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
++  )
++    return "Enter a valid email address.";
++  if (password.length < 12 || password.length > 128)
++    return "Use a password with 12–128 characters.";
++  if (password !== confirmation) return "Passwords do not match.";
++  return null;
++}
++export function passwordStrength(password: string): string {
++  if (!password) return "Use 12–128 characters.";
++  if (password.length < 12) return "Too short";
++  const variety = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^a-zA-Z0-9]/].filter(
++    (pattern) => pattern.test(password),
++  ).length;
++  return password.length >= 16 && variety >= 3
++    ? "Strong length and variety"
++    : "Good length; consider a longer, varied passphrase";
++}
+diff --git a/src/lib/session.tsx b/src/lib/session.tsx
+index 2e6afb6..b51b111 100644
+--- a/src/lib/session.tsx
++++ b/src/lib/session.tsx
+@@ -1,11 +1,22 @@
+-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
++import {
++  createContext,
++  useContext,
++  useEffect,
++  useState,
++  type ReactNode,
++} from "react";
+ import { isSupabaseConfigured, supabase } from "./supabase";
+ 
+ type SessionState =
+   | { status: "loading" }
+   | { status: "error"; message: string }
+   | { status: "signedOut" }
+-  | { status: "ready"; userId: string; email: string | null };
++  | {
++      status: "ready";
++      userId: string;
++      email: string | null;
++      emailVerified: boolean;
++    };
+ 
+ const SessionContext = createContext<SessionState>({ status: "loading" });
+ 
+@@ -17,7 +28,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
+       ? { status: "loading" }
+       : {
+           status: "error",
+-          message: "Supabase is not configured. Fill in .env, then restart with: npx expo start -c",
++          message:
++            "Supabase is not configured. Fill in .env, then restart with: npx expo start -c",
+         },
+   );
+ 
+@@ -25,26 +37,49 @@ export function SessionProvider({ children }: { children: ReactNode }) {
+     if (!isSupabaseConfigured) return;
+ 
+     let cancelled = false;
+-    const apply = (user: { id: string; email?: string } | undefined) => {
++    const apply = (
++      user:
++        { id: string; email?: string; email_confirmed_at?: string } | undefined,
++    ) => {
+       if (cancelled) return;
+-      setState(user ? { status: "ready", userId: user.id, email: user.email ?? null } : { status: "signedOut" });
++      setState(
++        user
++          ? {
++              status: "ready",
++              userId: user.id,
++              email: user.email ?? null,
++              emailVerified: Boolean(user.email_confirmed_at),
++            }
++          : { status: "signedOut" },
++      );
+     };
+ 
++    let authChanged = false;
+     supabase.auth
+       .getSession()
+-      .then(({ data }) => apply(data.session?.user))
++      .then(({ data, error }) => {
++        if (authChanged) return;
++        if (error) throw error;
++        apply(data.session?.user);
++      })
+       .catch((e) => {
+-        if (!cancelled) setState({ status: "error", message: String(e?.message ?? e) });
++        if (!cancelled && !authChanged)
++          setState({ status: "error", message: String(e?.message ?? e) });
+       });
+ 
+-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => apply(session?.user));
++    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
++      authChanged = true;
++      apply(session?.user);
++    });
+     return () => {
+       cancelled = true;
+       sub.subscription.unsubscribe();
+     };
+   }, []);
+ 
+-  return <SessionContext.Provider value={state}>{children}</SessionContext.Provider>;
++  return (
++    <SessionContext.Provider value={state}>{children}</SessionContext.Provider>
++  );
+ }
+ 
+ export function useSession() {
+diff --git a/src/lib/verificationProgress.ts b/src/lib/verificationProgress.ts
+new file mode 100644
+index 0000000..d84eaa4
+--- /dev/null
++++ b/src/lib/verificationProgress.ts
+@@ -0,0 +1,73 @@
++import { supabase } from "./supabase";
++
++export const reviewStatuses = [
++  "pending_email",
++  "awaiting_upload",
++  "queued",
++  "processing",
++  "manual_review",
++  "needs_reupload",
++  "approved",
++  "rejected",
++] as const;
++export type ReviewStatus = (typeof reviewStatuses)[number];
++export type VerificationProgress = {
++  emailVerified: boolean;
++  schoolVerified: boolean;
++  reviewStatus: ReviewStatus | null;
++};
++export type ProgressStep = {
++  key: "account" | "email" | "submission" | "review";
++  state: "complete" | "current" | "locked";
++};
++
++export function progressSteps(
++  progress: VerificationProgress | null,
++  signedIn: boolean,
++): ProgressStep[] {
++  const email = signedIn && Boolean(progress?.emailVerified);
++  const submitted =
++    email &&
++    ["queued", "processing", "manual_review", "approved"].includes(
++      progress?.reviewStatus ?? "",
++    );
++  const approved =
++    submitted &&
++    progress?.reviewStatus === "approved" &&
++    Boolean(progress.schoolVerified);
++  const steps = [
++    { key: "account" as const, done: signedIn },
++    { key: "email" as const, done: email },
++    { key: "submission" as const, done: submitted },
++    { key: "review" as const, done: approved },
++  ];
++  let locked = false;
++  return steps.map(({ key, done }) => {
++    const state = locked ? "locked" : done ? "complete" : "current";
++    if (!done) locked = true;
++    return { key, state };
++  });
++}
++
++// No user ID parameter: the database chooses auth.uid(), not a client-supplied owner.
++export async function loadVerificationProgress(): Promise<VerificationProgress> {
++  const { data, error } = await supabase.rpc("my_verification_progress");
++  if (error) throw error;
++  if (
++    !data ||
++    typeof data.email_verified !== "boolean" ||
++    typeof data.school_verified !== "boolean" ||
++    !(
++      data.review_status === null || reviewStatuses.includes(data.review_status)
++    )
++  ) {
++    throw new Error(
++      "The verification status could not be validated. Please retry.",
++    );
++  }
++  return {
++    emailVerified: data.email_verified,
++    schoolVerified: data.school_verified,
++    reviewStatus: data.review_status,
++  };
++}
+diff --git a/supabase/migrations/004_verification_progress.sql b/supabase/migrations/004_verification_progress.sql
+new file mode 100644
+index 0000000..a1fff87
+--- /dev/null
++++ b/supabase/migrations/004_verification_progress.sql
+@@ -0,0 +1,29 @@
++-- Read-only progress for the authenticated owner. Apply after migrations 001–003.
++-- No trust, CAPTCHA, role, badge, or approval is granted by this function.
++begin;
++create or replace function public.my_verification_progress()
++returns jsonb
++language plpgsql
++stable
++security definer
++set search_path = public
++as $$
++declare
++  me uuid := auth.uid();
++  confirmed boolean;
++  affiliation boolean;
++  latest_status text;
++begin
++  if me is null then raise exception 'not authenticated'; end if;
++  select email_confirmed_at is not null into confirmed from auth.users where id = me;
++  if not found then raise exception 'account not found'; end if;
++  select school_verified_at is not null into affiliation from public.profiles where id = me;
++  select status into latest_status from public.verification_requests
++    where user_id = me order by created_at desc, id desc limit 1;
++  return jsonb_build_object('email_verified', confirmed,
++    'school_verified', coalesce(affiliation, false), 'review_status', latest_status);
++end;
++$$;
++revoke all on function public.my_verification_progress() from public, anon;
++grant execute on function public.my_verification_progress() to authenticated;
++commit;
+-- 
+2.52.0
+
