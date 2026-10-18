@@ -2,6 +2,8 @@
 
 Responsive Next.js/React pages with PostgreSQL-backed authentication, verification, membership, settings, administrator review, and feature access control. Implemented scope covers Steps 1–12 and the additive identity/onboarding enhancement described below; it is not a complete campus platform.
 
+See [signup and verification flow improvements](docs/signup-verification-enhancements.md) for the reference PR comparison, branch scope, tests, and remaining limitations.
+
 ## Implemented
 
 - Sign up with first name, last name, username, email, password/confirmation, school, and one of the five requested academic roles.
@@ -22,7 +24,7 @@ The local instance uses a **development outbox**. Emails are written to private 
 - Administrator verification review/moderation with recent 2FA, audited decisions, clean-scan approval gates, and suspension/ban session revocation.
 - Server/API verification and Premium guards, basic persisted community surfaces, theme/mascot skins, content-count analytics, and eligible schoolmate/tutor directories. GPA calculator and club finder are not built.
 
-See [Steps 7–12 implementation and configuration](docs/membership-and-access.md) for the exact scope, schema, endpoints, permission model, Stripe setup, and verified limitations. Current checks: production build, TypeScript, **58 backend tests and 32 browser tests passed**. Payment tests use fixtures, not a Stripe account.
+See [Steps 7–12 implementation and configuration](docs/membership-and-access.md) for the exact scope, schema, endpoints, permission model, Stripe setup, and verified limitations. Current checks: production build, TypeScript, **60 backend tests and 33 browser tests passed**. Payment tests use fixtures, not a Stripe account.
 
 ## Identity and onboarding extension
 
